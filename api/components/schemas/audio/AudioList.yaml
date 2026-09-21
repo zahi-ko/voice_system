@@ -1,0 +1,9 @@
+type: object
+title: List of Audio Files
+description: A list of audio files available in the system.
+required: [items]
+properties:
+  items:
+    type: array
+    items:
+      $ref: './AudioMeta.yaml'

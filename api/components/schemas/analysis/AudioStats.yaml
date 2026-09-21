@@ -1,0 +1,30 @@
+type: object
+title: Basic Audio Statistics
+description: Basic statistics about an audio file.
+required: [id, duration, sampleRate, channels, rms, peak]
+properties:
+  id:
+    type: string
+    description: Unique identifier for the audio file.
+  duration:
+    type: number
+    description: The duration of the audio file in seconds.
+    readonly: true
+  sampleRate:
+    type: integer
+    description: The sample rate of the audio file in Hz.
+    readonly: true
+  channels:
+    type: integer
+    description: The number of audio channels in the file.
+    enum: [1, 2]
+    readonly: true
+  rms:
+    type: number
+    description: The root mean square (RMS) value of the audio signal.
+    readonly: true
+  peak:
+    type: number
+    description: The peak amplitude of the audio signal.
+    readonly: true
+  

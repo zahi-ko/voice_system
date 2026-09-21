@@ -1,0 +1,20 @@
+type: object
+title: Spectrum Response
+description: The response for a spectrum analysis request.
+required: [id, spectrum_data, frequencies]
+properties:
+  id:
+    type: string
+    description: The unique identifier of the audio file.
+  spectrum_data:
+    type: array
+    description: The spectrum data of the audio file.
+    items:
+      type: number
+    readOnly: true
+  frequencies:
+    type: array
+    description: The frequency bins corresponding to the spectrum data.
+    items:
+      type: number
+    readOnly: true

@@ -1,0 +1,165 @@
+getStats:
+  get:
+    summary: Get audio statistics
+    description: Retrieve statistical information about an audio file.
+    tags: [Analysis]
+    operationId: GetStats
+    parameters:
+      - name: audioId
+        in: path
+        required: true
+        description: The unique identifier of the audio file to analyze.
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Audio statistics retrieved successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../server.yaml#/components/schemas/AudioStats'
+      '404':
+        $ref: '../server.yaml#/components/responses/NotFound'
+      '500':
+        $ref: '../server.yaml#/components/responses/InternalServerError'
+      '503':
+        $ref: '../server.yaml#/components/responses/ServiceUnavailable'
+
+getWaveform:
+  get:
+    summary: Get audio waveform
+    description: Retrieve the waveform data of an audio file.
+    tags: [Analysis]
+    operationId: GetWaveform
+    parameters:
+      - name: audioId
+        in: path
+        required: true
+        description: The unique identifier of the audio file to analyze.
+        schema:
+          type: string
+      - name: points
+        in: query
+        required: false
+        description: The number of points to sample from the waveform.
+        schema:
+          type: integer
+          minimum: 100
+          maximum: 20000
+          default: 2000
+    responses:
+      '200':
+        description: Audio waveform retrieved successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../server.yaml#/components/schemas/WaveformResponse'
+      '400':
+        $ref: '../server.yaml#/components/responses/BadRequest'
+      '404':
+        $ref: '../server.yaml#/components/responses/NotFound'
+      '500':
+        $ref: '../server.yaml#/components/responses/InternalServerError'
+      '503':
+        $ref: '../server.yaml#/components/responses/ServiceUnavailable'
+
+getSpectrum:
+  get:
+    summary: Get audio spectrum
+    description: Retrieve the spectrum data of an audio file.
+    tags: [Analysis]
+    operationId: GetSpectrum
+    parameters:
+      - name: audioId
+        in: path
+        required: true
+        description: The unique identifier of the audio file to analyze.
+        schema:
+          type: string
+      - name: nfft
+        in: query
+        required: false
+        description: The number of points in the FFT (Fast Fourier Transform) for spectrum analysis.
+        schema:
+          type: integer
+          enum: [128, 256, 512, 1024, 2048, 4096, 8192]
+          default: 1024
+    responses:
+      '200':
+        description: Audio spectrum retrieved successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../server.yaml#/components/schemas/SpectrumResponse'
+      '400':
+        $ref: '../server.yaml#/components/responses/BadRequest'
+      '404':
+        $ref: '../server.yaml#/components/responses/NotFound'
+      '500':
+        $ref: '../server.yaml#/components/responses/InternalServerError'
+      '503':
+        $ref: '../server.yaml#/components/responses/ServiceUnavailable'
+
+getSpectrogram:
+  get:
+    summary: Get audio spectrogram
+    description: Retrieve the spectrogram data of an audio file.
+    tags: [Analysis]
+    operationId: GetSpectrogram
+    parameters:
+      - name: audioId
+        in: path
+        required: true
+        description: The unique identifier of the audio file to analyze.
+        schema:
+          type: string
+      - name: nfft
+        in: query
+        required: false
+        description: The number of points in the FFT (Fast Fourier Transform) for spectrogram analysis.
+        schema:
+          type: integer
+          enum: [128, 256, 512, 1024, 2048, 4096, 8192]
+          default: 1024
+      - name: max_frames
+        in: query
+        required: false
+        description: The maximum number of frames to include in the spectrogram.
+        schema:
+          type: integer
+          minimum: 60
+          maximum: 1200
+          default: 480
+      - name: floor_db
+        in: query
+        required: false
+        description: The floor decibel level for the spectrogram.
+        schema:
+          type: number
+          minimum: -200.0
+          maximum: 0.0
+          default: -80.0
+      - name: ceiling_db
+        in: query
+        required: false
+        description: The ceiling decibel level for the spectrogram.
+        schema:
+          type: number
+          minimum: -100.0
+          maximum: 60.0
+          default: 0.0
+    responses:
+      '200':
+        description: Audio spectrogram retrieved successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../server.yaml#/components/schemas/SpectrogramResponse'
+      '400':
+        $ref: '../server.yaml#/components/responses/BadRequest'
+      '404':
+        $ref: '../server.yaml#/components/responses/NotFound'
+      '500':
+        $ref: '../server.yaml#/components/responses/InternalServerError'
+      '503':
+        $ref: '../server.yaml#/components/responses/ServiceUnavailable'

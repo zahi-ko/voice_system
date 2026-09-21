@@ -1,0 +1,38 @@
+type: object
+title: Spectrogram Response
+description: The response for a spectrogram analysis request.
+required: [id, times, frequencies, data, floor_db, ceiling_db]
+properties:
+  id:
+    type: string
+    description: The unique identifier of the audio file.
+  times:
+    type: array
+    description: The time bins corresponding to the spectrogram data.
+    items:
+      type: number
+    readOnly: true
+  frequencies:
+    type: array
+    description: The frequency bins corresponding to the spectrogram data.
+    items:
+      type: number
+    readOnly: true
+  data:
+    type: array
+    description: The spectrogram data of the audio file
+    items:
+      type: array
+      items:
+        type: integer
+        minimum: 0
+        maximum: 255
+    readOnly: true
+  floor_db:
+    type: number
+    description: The floor decibel level used for the spectrogram visualization.
+    default: -80.0
+  ceiling_db:
+    type: number
+    description: The ceiling decibel level used for the spectrogram visualization.
+    default: 0.0

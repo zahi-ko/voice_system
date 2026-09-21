@@ -1,0 +1,23 @@
+type: object
+title: Waveform Response
+description: The response for a waveform request.
+required: [id, duration, min_values, max_values]
+properties:
+  id:
+    type: string
+    description: The unique identifier of the audio file.
+  duration:
+    type: number
+    description: The duration of the audio file in seconds.
+  min_values:
+    type: array
+    description: The minimum amplitude value in the waveform.
+    items:
+      type: number
+    readOnly: true
+  max_values:
+    type: array
+    description: The maximum amplitude value in the waveform.
+    items:
+      type: number
+    readOnly: true

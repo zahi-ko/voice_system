@@ -1,0 +1,45 @@
+emptyParams:
+  type: object
+  description: An empty set of parameters.
+  additionalProperties: false
+  maxProperties: 0
+
+gainParams:
+  type: object
+  description: Parameters for the gain effect.
+  required: [db]
+  additionalProperties: false
+  properties:
+    db:
+      type: number
+      description: The gain in decibels to apply to the audio signal. A value of 0.0 means no change, positive values amplify the signal, and negative values attenuate it.
+      minimum: -60.0
+      maximum: 12.0
+      default: 0.0
+
+tempoParams:
+  type: object
+  description: Parameters for the tempo effect.
+  required: [tempo]
+  additionalProperties: false
+  properties:
+    tempo:
+      type: number
+      description: The tempo factor to apply to the audio signal. A value of 1.0 means no change, greater than 1.0 speeds up the audio, and less than 1.0 slows it down.
+      minimum: 0.5
+      maximum: 2.0
+      default: 1.0 
+
+normalizationParams:
+  type: object
+  description: Parameters for the normalization effect.
+  required: [targetLevel]
+  additionalProperties: false
+  properties:
+    targetLevel:
+      type: number
+      description: The target level in decibels to normalize the audio signal to. A value of 0.0 means no change, positive values amplify the signal, and negative values attenuate it.
+      minimum: -60.0
+      maximum: 0.0
+      default: -1.0
+      

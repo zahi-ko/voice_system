@@ -1,0 +1,100 @@
+listAudio:
+  get:
+    summary: List all audio files
+    description: Retrieve a list of all audio files available in the system.
+    tags: [Audio]
+    operationId: ListAudio
+    responses:
+      '200':
+        description: A list of audio files.
+        content:
+          application/json:
+            schema:
+              $ref: '../server.yaml#/components/schemas/AudioList'
+      '400':
+        $ref: '../server.yaml#/components/responses/BadRequest'
+      '404':
+        $ref: '../server.yaml#/components/responses/NotFound'
+
+uploadAudio:
+  post:
+    summary: Upload an audio file
+    description: Upload a new audio file to the system.
+    tags: [Audio]
+    operationId: UploadAudio
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [file]
+            properties:
+              file:
+                type: string
+                format: binary
+                description: The audio file to upload.
+    responses:
+      '201':
+        description: Audio file uploaded successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../server.yaml#/components/schemas/AudioMeta'
+      '400':
+        $ref: '../server.yaml#/components/responses/BadRequest'
+      '500':
+        $ref: '../server.yaml#/components/responses/InternalServerError'
+      '503':
+        $ref: '../server.yaml#/components/responses/ServiceUnavailable'
+
+removeAudio:
+  delete:
+    summary: Remove an audio file
+    description: Remove an existing audio file from the system.
+    tags: [Audio]
+    operationId: RemoveAudio
+    parameters:
+      - name: audioId
+        in: path
+        required: true
+        description: The unique identifier of the audio file to remove.
+        schema:
+          type: string
+    responses:
+      '204':
+        description: Audio file removed successfully.
+      '404':
+        $ref: '../server.yaml#/components/responses/NotFound'
+      '500':
+        $ref: '../server.yaml#/components/responses/InternalServerError'
+      '503':
+        $ref: '../server.yaml#/components/responses/ServiceUnavailable'
+
+downloadAudio:
+  get:
+    summary: Download an audio file
+    description: Download an existing audio file from the system.
+    tags: [Audio]
+    operationId: DownloadAudio
+    parameters:
+      - name: audioId
+        in: path
+        required: true
+        description: The unique identifier of the audio file to download.
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Audio file downloaded successfully.
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      '404':
+        $ref: '../server.yaml#/components/responses/NotFound'
+      '500':
+        $ref: '../server.yaml#/components/responses/InternalServerError'
+      '503':
+        $ref: '../server.yaml#/components/responses/ServiceUnavailable'

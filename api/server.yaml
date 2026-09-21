@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: Audio API
   version: 0.1.0
@@ -21,35 +21,69 @@ paths:
   /audio/{audioId}/download:
     $ref: './paths/audio.yaml#/downloadAudio'
 
-  /device:
-    $ref: './paths/device.yaml#/listDevices'
-  #! recording handled to frontend
-  # /device/record/start:
-  #   $ref: './paths/device.yaml#/startRecording'
-  # /device/record/stop:
-  #   $ref: './paths/device.yaml#/stopRecording'
-  # /device/record/status:
-  #   $ref: './paths/device.yaml#/getRecordingStatus'
-
-  /analysis/{audioId}/peaks:
-    $ref: './paths/analysis.yaml#/getPeaks'
   /analysis/{audioId}/stats:
     $ref: './paths/analysis.yaml#/getStats'
-  /analysis/{audioId}/spectrogram:
-    $ref: './paths/analysis.yaml#/getSpectrogram'
   /analysis/{audioId}/waveform:
     $ref: './paths/analysis.yaml#/getWaveform'
+  /analysis/{audioId}/spectrogram:
+    $ref: './paths/analysis.yaml#/getSpectrogram'
+  /analysis/{audioId}/spectrum:
+    $ref: './paths/analysis.yaml#/getSpectrum'
 
-  /effects/{audioId}/apply:
-    $ref: './paths/effects.yaml#/applyEffect'
-  /effects/{audioId}/list:
-    $ref: './paths/effects.yaml#/listEffects'
-  /effects/{audioId}/undo:
-    $ref: './paths/effects.yaml#/undoEffect'
-  /effects/{audioId}/chain:
-    $ref: './paths/effects.yaml#/applyEffectChain'
-  /effects/{audioId}/history:
-    $ref: './paths/effects.yaml#/getEffectHistory'
+  # /effects/{audioId}/apply:
+  #   $ref: './paths/effects.yaml#/applyEffect'
+  # /effects/{audioId}/list:
+  #   $ref: './paths/effects.yaml#/listEffects'
+  # /effects/{audioId}/undo:
+  #   $ref: './paths/effects.yaml#/undoEffect'
+  # /effects/{audioId}/chain:
+  #   $ref: './paths/effects.yaml#/applyEffectChain'
+  # /effects/{audioId}/history:
+  #   $ref: './paths/effects.yaml#/getEffectHistory'
 
   #TODO: And endpoints for clone service.
 
+components:
+  schemas:
+    AudioMeta:
+      $ref: './components/schemas/audio/AudioMeta.yaml'
+    AudioList:
+      $ref: './components/schemas/audio/AudioList.yaml'
+    AudioStats:
+      $ref: './components/schemas/analysis/AudioStats.yaml'
+
+    WaveformResponse:
+      $ref: './components/schemas/analysis/WaveformResponse.yaml'
+    SpectrumResponse:
+      $ref: './components/schemas/analysis/SpectrumResponse.yaml'
+    SpectrogramResponse:
+      $ref: './components/schemas/analysis/SpectrogramResponse.yaml'
+
+    Error:
+      $ref: './components/schemas/common/Error.yaml'
+
+  responses:
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: The request was invalid or cannot be served.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: An unexpected error occurred on the server.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServiceUnavailable:
+      description: The service is temporarily unavailable.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
