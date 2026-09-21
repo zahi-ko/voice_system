@@ -1,0 +1,55 @@
+openapi: 3.0.3
+info:
+  title: Audio API
+  version: 0.1.0
+  description: This is an API for audio processing and management.
+
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+paths:
+  /health:
+    $ref: './paths/health.yaml'
+
+  /audio:
+    $ref: './paths/audio.yaml#/listAudio'
+  /audio/upload:
+    $ref: './paths/audio.yaml#/uploadAudio'
+  /audio/{audioId}:
+    $ref: './paths/audio.yaml#/removeAudio'
+  /audio/{audioId}/download:
+    $ref: './paths/audio.yaml#/downloadAudio'
+
+  /device:
+    $ref: './paths/device.yaml#/listDevices'
+  #! recording handled to frontend
+  # /device/record/start:
+  #   $ref: './paths/device.yaml#/startRecording'
+  # /device/record/stop:
+  #   $ref: './paths/device.yaml#/stopRecording'
+  # /device/record/status:
+  #   $ref: './paths/device.yaml#/getRecordingStatus'
+
+  /analysis/{audioId}/peaks:
+    $ref: './paths/analysis.yaml#/getPeaks'
+  /analysis/{audioId}/stats:
+    $ref: './paths/analysis.yaml#/getStats'
+  /analysis/{audioId}/spectrogram:
+    $ref: './paths/analysis.yaml#/getSpectrogram'
+  /analysis/{audioId}/waveform:
+    $ref: './paths/analysis.yaml#/getWaveform'
+
+  /effects/{audioId}/apply:
+    $ref: './paths/effects.yaml#/applyEffect'
+  /effects/{audioId}/list:
+    $ref: './paths/effects.yaml#/listEffects'
+  /effects/{audioId}/undo:
+    $ref: './paths/effects.yaml#/undoEffect'
+  /effects/{audioId}/chain:
+    $ref: './paths/effects.yaml#/applyEffectChain'
+  /effects/{audioId}/history:
+    $ref: './paths/effects.yaml#/getEffectHistory'
+
+  #TODO: And endpoints for clone service.
+
