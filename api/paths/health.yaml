@@ -1,0 +1,8 @@
+get:
+  summary: Health check endpoint
+  description: Returns the health status of the API.
+  responses:
+    '200':
+      description: The API is healthy.
+    '503':
+      description: The API is unavailable.

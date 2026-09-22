@@ -1,0 +1,885 @@
+openapi: 3.1.0
+info:
+  title: Audio API
+  version: 0.1.0
+  description: This is an API for audio processing and management.
+servers:
+  - url: http://localhost:8080
+    description: Local server
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Returns the health status of the API.
+      responses:
+        '200':
+          description: The API is healthy.
+        '503':
+          description: The API is unavailable.
+  /audio:
+    get:
+      summary: List all audio files
+      description: Retrieve a list of all audio files available in the system.
+      tags:
+        - Audio
+      operationId: ListAudio
+      responses:
+        '200':
+          description: A list of audio files.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AudioList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /audio/upload:
+    post:
+      summary: Upload an audio file
+      description: Upload a new audio file to the system.
+      tags:
+        - Audio
+      operationId: UploadAudio
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The audio file to upload.
+      responses:
+        '201':
+          description: Audio file uploaded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AudioMeta'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /audio/{audioId}:
+    delete:
+      summary: Remove an audio file
+      description: Remove an existing audio file from the system.
+      tags:
+        - Audio
+      operationId: RemoveAudio
+      parameters:
+        - name: audioId
+          in: path
+          required: true
+          description: The unique identifier of the audio file to remove.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Audio file removed successfully.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /audio/{audioId}/download:
+    get:
+      summary: Download an audio file
+      description: Download an existing audio file from the system.
+      tags:
+        - Audio
+      operationId: DownloadAudio
+      parameters:
+        - name: audioId
+          in: path
+          required: true
+          description: The unique identifier of the audio file to download.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Audio file downloaded successfully.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /analysis/{audioId}/stats:
+    get:
+      summary: Get audio statistics
+      description: Retrieve statistical information about an audio file.
+      tags:
+        - Analysis
+      operationId: GetStats
+      parameters:
+        - name: audioId
+          in: path
+          required: true
+          description: The unique identifier of the audio file to analyze.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Audio statistics retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AudioStats'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /analysis/{audioId}/waveform:
+    get:
+      summary: Get audio waveform
+      description: Retrieve the waveform data of an audio file.
+      tags:
+        - Analysis
+      operationId: GetWaveform
+      parameters:
+        - name: audioId
+          in: path
+          required: true
+          description: The unique identifier of the audio file to analyze.
+          schema:
+            type: string
+        - name: points
+          in: query
+          required: false
+          description: The number of points to sample from the waveform.
+          schema:
+            type: integer
+            minimum: 100
+            maximum: 20000
+            default: 2000
+      responses:
+        '200':
+          description: Audio waveform retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaveformResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /analysis/{audioId}/spectrogram:
+    get:
+      summary: Get audio spectrogram
+      description: Retrieve the spectrogram data of an audio file.
+      tags:
+        - Analysis
+      operationId: GetSpectrogram
+      parameters:
+        - name: audioId
+          in: path
+          required: true
+          description: The unique identifier of the audio file to analyze.
+          schema:
+            type: string
+        - name: nfft
+          in: query
+          required: false
+          description: The number of points in the FFT (Fast Fourier Transform) for spectrogram analysis.
+          schema:
+            type: integer
+            enum:
+              - 128
+              - 256
+              - 512
+              - 1024
+              - 2048
+              - 4096
+              - 8192
+            default: 1024
+        - name: max_frames
+          in: query
+          required: false
+          description: The maximum number of frames to include in the spectrogram.
+          schema:
+            type: integer
+            minimum: 60
+            maximum: 1200
+            default: 480
+        - name: floor_db
+          in: query
+          required: false
+          description: The floor decibel level for the spectrogram.
+          schema:
+            type: number
+            minimum: -200
+            maximum: 0
+            default: -80
+        - name: ceiling_db
+          in: query
+          required: false
+          description: The ceiling decibel level for the spectrogram.
+          schema:
+            type: number
+            minimum: -100
+            maximum: 60
+            default: 0
+      responses:
+        '200':
+          description: Audio spectrogram retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpectrogramResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /analysis/{audioId}/spectrum:
+    get:
+      summary: Get audio spectrum
+      description: Retrieve the spectrum data of an audio file.
+      tags:
+        - Analysis
+      operationId: GetSpectrum
+      parameters:
+        - name: audioId
+          in: path
+          required: true
+          description: The unique identifier of the audio file to analyze.
+          schema:
+            type: string
+        - name: nfft
+          in: query
+          required: false
+          description: The number of points in the FFT (Fast Fourier Transform) for spectrum analysis.
+          schema:
+            type: integer
+            enum:
+              - 128
+              - 256
+              - 512
+              - 1024
+              - 2048
+              - 4096
+              - 8192
+            default: 1024
+      responses:
+        '200':
+          description: Audio spectrum retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpectrumResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /effects/{audioId}/apply:
+    post:
+      summary: Apply audio effects to an audio file
+      description: Apply an audio effect to an audio file and return the modified audio file.
+      operationId: ApplyEffect
+      parameters:
+        - name: audioId
+          in: path
+          required: true
+          description: The unique identifier of the audio file to analyze.
+          schema:
+            type: string
+            format: uuid
+        - name: saveAsNew
+          in: query
+          required: false
+          description: Whether to save the modified audio as a new file. If false, the original file will be overwritten.
+          schema:
+            type: boolean
+            default: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EffectInfo'
+      responses:
+        '200':
+          description: Audio effect applied successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AudioMeta'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /effects/{audioId}/list:
+    get:
+      summary: List available audio effects
+      description: Retrieve a list of available audio effects that can be applied to an audio file.
+      tags:
+        - Effects
+      operationId: ListEffects
+      parameters:
+        - name: audioId
+          in: path
+          required: true
+          description: The unique identifier of the audio file to analyze.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of available audio effects retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EffectInfo'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /effects/{audioId}/undo:
+    post:
+      summary: Undo the last applied audio effect
+      description: Undo the last applied audio effect on an audio file and return the modified audio file.
+      operationId: UndoEffect
+      parameters:
+        - name: audioId
+          in: path
+          required: true
+          description: The unique identifier of the audio file to analyze.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Last applied audio effect undone successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    type: string
+                    description: The unique identifier of the audio file after undoing the last effect.
+                    format: uuid
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /effects/{audioId}/chain:
+    post:
+      summary: Apply a chain of audio effects to an audio file
+      description: Apply a sequence of audio effects to an audio file and return the modified audio file.
+      operationId: ApplyEffectChain
+      parameters:
+        - name: audioId
+          in: path
+          required: true
+          description: The unique identifier of the audio file to analyze.
+          schema:
+            type: string
+            format: uuid
+        - name: saveAsNew
+          in: query
+          required: false
+          description: Whether to save the modified audio as a new file. If false, the original file will be overwritten.
+          schema:
+            type: boolean
+            default: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/EffectStep'
+      responses:
+        '200':
+          description: Audio effect chain applied successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - applied_effects
+                  - metadata
+                properties:
+                  id:
+                    type: string
+                    description: The unique identifier of the audio file after applying the effect chain.
+                    format: uuid
+                  applied_effects:
+                    type: array
+                    description: A list of the effects that were applied in the order they were applied.
+                    items:
+                      $ref: '#/components/schemas/EffectStep'
+                  metadata:
+                    $ref: '#/components/schemas/AudioMeta'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /effects/{audioId}/history:
+    get:
+      summary: Get the history of applied audio effects
+      description: Retrieve the history of audio effects that have been applied to an audio file.
+      operationId: GetEffectHistory
+      parameters:
+        - name: audioId
+          in: path
+          required: true
+          description: The unique identifier of the audio file to analyze.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Audio effect history retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - history
+                  - rootAudioId
+                properties:
+                  id:
+                    type: string
+                    description: The unique identifier of the audio file.
+                    format: uuid
+                  history:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EffectHistoryItem'
+                  rootAudioId:
+                    type: string
+                    description: The unique identifier of the original audio file before any effects were applied.
+                    format: uuid
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+components:
+  schemas:
+    AudioMeta:
+      type: object
+      title: Audio File Metadata
+      description: Metadata information about an audio file.
+      required:
+        - id
+        - sample_rate
+        - channels
+        - duration
+        - created_at
+        - name
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the audio file.
+          readOnly: true
+        sample_rate:
+          type: integer
+          description: The sample rate of the audio file in Hz
+          enum:
+            - 8000
+            - 16000
+            - 22050
+            - 44100
+            - 48000
+          default: 44100
+          readOnly: true
+        channels:
+          type: integer
+          description: The number of audio channels (1 for mono, 2 for stereo).
+          enum:
+            - 1
+            - 2
+          readOnly: true
+        duration:
+          type: number
+          description: The duration of the audio file in seconds.
+          exclusiveMinimum: 0
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the audio file was created.
+          readOnly: true
+        name:
+          type: string
+          description: The name of the audio file.
+          readOnly: true
+    AudioList:
+      type: object
+      title: List of Audio Files
+      description: A list of audio files available in the system.
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AudioMeta'
+    AudioStats:
+      type: object
+      title: Basic Audio Statistics
+      description: Basic statistics about an audio file.
+      required:
+        - id
+        - duration
+        - sampleRate
+        - channels
+        - rms
+        - peak
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the audio file.
+        duration:
+          type: number
+          description: The duration of the audio file in seconds.
+        sampleRate:
+          type: integer
+          description: The sample rate of the audio file in Hz.
+        channels:
+          type: integer
+          description: The number of audio channels in the file.
+          enum:
+            - 1
+            - 2
+        rms:
+          type: number
+          description: The root mean square (RMS) value of the audio signal.
+        peak:
+          type: number
+          description: The peak amplitude of the audio signal.
+    WaveformResponse:
+      type: object
+      title: Waveform Response
+      description: The response for a waveform request.
+      required:
+        - id
+        - duration
+        - min_values
+        - max_values
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the audio file.
+        duration:
+          type: number
+          description: The duration of the audio file in seconds.
+        min_values:
+          type: array
+          description: The minimum amplitude value in the waveform.
+          items:
+            type: number
+          readOnly: true
+        max_values:
+          type: array
+          description: The maximum amplitude value in the waveform.
+          items:
+            type: number
+          readOnly: true
+    SpectrumResponse:
+      type: object
+      title: Spectrum Response
+      description: The response for a spectrum analysis request.
+      required:
+        - id
+        - spectrum_data
+        - frequencies
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the audio file.
+        spectrum_data:
+          type: array
+          description: The spectrum data of the audio file.
+          items:
+            type: number
+          readOnly: true
+        frequencies:
+          type: array
+          description: The frequency bins corresponding to the spectrum data.
+          items:
+            type: number
+          readOnly: true
+    SpectrogramResponse:
+      type: object
+      title: Spectrogram Response
+      description: The response for a spectrogram analysis request.
+      required:
+        - id
+        - times
+        - frequencies
+        - data
+        - floor_db
+        - ceiling_db
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the audio file.
+        times:
+          type: array
+          description: The time bins corresponding to the spectrogram data.
+          items:
+            type: number
+          readOnly: true
+        frequencies:
+          type: array
+          description: The frequency bins corresponding to the spectrogram data.
+          items:
+            type: number
+          readOnly: true
+        data:
+          type: array
+          description: The spectrogram data of the audio file
+          items:
+            type: array
+            items:
+              type: integer
+              minimum: 0
+              maximum: 255
+          readOnly: true
+        floor_db:
+          type: number
+          description: The floor decibel level used for the spectrogram visualization.
+          default: -80
+        ceiling_db:
+          type: number
+          description: The ceiling decibel level used for the spectrogram visualization.
+          default: 0
+    EffectInfo:
+      type: object
+      title: Effect Information
+      description: Information about an audio effect applied to an audio file.
+      allOf:
+        - $ref: '#/components/schemas/EffectEntityBase'
+    EffectStep:
+      type: object
+      title: Effect Step
+      description: A step in an effect chain, which includes the effect's name and its parameters.
+      allOf:
+        - $ref: '#/components/schemas/EffectEntityBase'
+    EffectHistoryItem:
+      type: object
+      title: Effect History Item
+      description: A record of an effect applied to an audio file
+      allOf:
+        - $ref: '#/components/schemas/EffectEntityBase'
+    Error:
+      type: object
+      title: Error
+      description: A standardized error response format for the API.
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Error code representing the type of error.
+          example: NOT_FOUND
+        message:
+          type: string
+          description: A human-readable message providing more details about the error.
+          example: The requested resource was not found.
+    EffectBase:
+      type: object
+      properties:
+        title:
+          type: string
+          description: A human-readable title for the effect, typically a translated name.
+          default: ''
+        description:
+          type: string
+          description: A detailed description of what the effect does.
+          default: ''
+    emptyParams:
+      type: object
+      description: An empty set of parameters.
+      additionalProperties: false
+      maxProperties: 0
+    ReverbEffect:
+      allOf:
+        - $ref: '#/components/schemas/EffectBase'
+        - type: object
+          required:
+            - name
+            - parameters
+          properties:
+            name:
+              type: string
+              description: The unique name of the effect.
+              enum:
+                - reverb
+            parameters:
+              $ref: '#/components/schemas/emptyParams'
+    gainParams:
+      type: object
+      description: Parameters for the gain effect.
+      required:
+        - db
+      additionalProperties: false
+      properties:
+        db:
+          type: number
+          description: The gain in decibels to apply to the audio signal. A value of 0.0 means no change, positive values amplify the signal, and negative values attenuate it.
+          minimum: -60
+          maximum: 12
+          default: 0
+    GainEffect:
+      allOf:
+        - $ref: '#/components/schemas/EffectBase'
+        - type: object
+          required:
+            - name
+            - parameters
+          properties:
+            name:
+              type: string
+              description: The unique name of the effect.
+              enum:
+                - gain
+            parameters:
+              $ref: '#/components/schemas/gainParams'
+    tempoParams:
+      type: object
+      description: Parameters for the tempo effect.
+      required:
+        - tempo
+      additionalProperties: false
+      properties:
+        tempo:
+          type: number
+          description: The tempo factor to apply to the audio signal. A value of 1.0 means no change, greater than 1.0 speeds up the audio, and less than 1.0 slows it down.
+          minimum: 0.5
+          maximum: 2
+          default: 1
+    TempoEffect:
+      allOf:
+        - $ref: '#/components/schemas/EffectBase'
+        - type: object
+          required:
+            - name
+            - parameters
+          properties:
+            name:
+              type: string
+              description: The unique name of the effect.
+              enum:
+                - tempo
+                - tempo_ola
+            parameters:
+              $ref: '#/components/schemas/tempoParams'
+    normalizationParams:
+      type: object
+      description: Parameters for the normalization effect.
+      required:
+        - targetLevel
+      additionalProperties: false
+      properties:
+        targetLevel:
+          type: number
+          description: The target level in decibels to normalize the audio signal to. A value of 0.0 means no change, positive values amplify the signal, and negative values attenuate it.
+          minimum: -60
+          maximum: 0
+          default: -1
+    NormalizationEffect:
+      allOf:
+        - $ref: '#/components/schemas/EffectBase'
+        - type: object
+          required:
+            - name
+            - parameters
+          properties:
+            name:
+              type: string
+              description: The unique name of the effect.
+              enum:
+                - normalization
+            parameters:
+              $ref: '#/components/schemas/normalizationParams'
+    EffectEntityBase:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/ReverbEffect'
+        - $ref: '#/components/schemas/GainEffect'
+        - $ref: '#/components/schemas/TempoEffect'
+        - $ref: '#/components/schemas/NormalizationEffect'
+      discriminator:
+        propertyName: name
+        mapping:
+          reverb: '#/components/schemas/ReverbEffect'
+          gain: '#/components/schemas/GainEffect'
+          tempo: '#/components/schemas/TempoEffect'
+          tempo_ola: '#/components/schemas/TempoEffect'
+          normalization: '#/components/schemas/NormalizationEffect'
+  responses:
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: The request was invalid or cannot be served.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: An unexpected error occurred on the server.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServiceUnavailable:
+      description: The service is temporarily unavailable.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

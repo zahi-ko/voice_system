@@ -30,16 +30,16 @@ paths:
   /analysis/{audioId}/spectrum:
     $ref: './paths/analysis.yaml#/getSpectrum'
 
-  # /effects/{audioId}/apply:
-  #   $ref: './paths/effects.yaml#/applyEffect'
-  # /effects/{audioId}/list:
-  #   $ref: './paths/effects.yaml#/listEffects'
-  # /effects/{audioId}/undo:
-  #   $ref: './paths/effects.yaml#/undoEffect'
-  # /effects/{audioId}/chain:
-  #   $ref: './paths/effects.yaml#/applyEffectChain'
-  # /effects/{audioId}/history:
-  #   $ref: './paths/effects.yaml#/getEffectHistory'
+  /effects/{audioId}/apply:
+    $ref: './paths/effects.yaml#/applyEffect'
+  /effects/{audioId}/list:
+    $ref: './paths/effects.yaml#/listEffects'
+  /effects/{audioId}/undo:
+    $ref: './paths/effects.yaml#/undoEffect'
+  /effects/{audioId}/chain:
+    $ref: './paths/effects.yaml#/applyEffectChain'
+  /effects/{audioId}/history:
+    $ref: './paths/effects.yaml#/getEffectHistory'
 
   #TODO: And endpoints for clone service.
 
@@ -58,6 +58,13 @@ components:
       $ref: './components/schemas/analysis/SpectrumResponse.yaml'
     SpectrogramResponse:
       $ref: './components/schemas/analysis/SpectrogramResponse.yaml'
+
+    EffectInfo:
+      $ref: './components/schemas/effects/EffectInfo.yaml#/EffectInfo'
+    EffectStep:
+      $ref: './components/schemas/effects/EffectStep.yaml'
+    EffectHistoryItem:
+      $ref: './components/schemas/effects/EffectHistoryItem.yaml'
 
     Error:
       $ref: './components/schemas/common/Error.yaml'

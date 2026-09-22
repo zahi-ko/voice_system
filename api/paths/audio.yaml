@@ -61,6 +61,7 @@ removeAudio:
         description: The unique identifier of the audio file to remove.
         schema:
           type: string
+          format: uuid
     responses:
       '204':
         description: Audio file removed successfully.
@@ -84,6 +85,7 @@ downloadAudio:
         description: The unique identifier of the audio file to download.
         schema:
           type: string
+          format: uuid
     responses:
       '200':
         description: Audio file downloaded successfully.

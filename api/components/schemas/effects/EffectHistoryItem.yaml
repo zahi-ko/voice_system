@@ -1,0 +1,5 @@
+type: object
+title: Effect History Item
+description: A record of an effect applied to an audio file
+allOf:
+  - $ref: './EffectInfo.yaml#/EffectEntityBase'

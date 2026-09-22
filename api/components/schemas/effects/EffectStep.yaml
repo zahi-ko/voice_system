@@ -1,0 +1,7 @@
+type: object
+title: Effect Step
+description: A step in an effect chain, which includes the effect's name and its parameters.
+allOf:
+  - $ref: './EffectInfo.yaml#/EffectEntityBase'
+
+# 单独把name和parameters作为属性构建新的schema会很麻烦，所以直接复用EffectEntityBase。

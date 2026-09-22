@@ -1,0 +1,198 @@
+listEffects:
+  get:
+    summary: List available audio effects
+    description: Retrieve a list of available audio effects that can be applied to an audio file.
+    tags: [Effects]
+    operationId: ListEffects
+    parameters:
+      - name: audioId
+        in: path
+        required: true
+        description: The unique identifier of the audio file to analyze.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      '200':
+        description: List of available audio effects retrieved successfully.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '../server.yaml#/components/schemas/EffectInfo'
+      '404':
+        $ref: '../server.yaml#/components/responses/NotFound'
+      '500':
+        $ref: '../server.yaml#/components/responses/InternalServerError'
+      '503':
+        $ref: '../server.yaml#/components/responses/ServiceUnavailable'
+
+applyEffect:
+  post:
+    summary: Apply audio effects to an audio file
+    description: Apply an audio effect to an audio file and return the modified audio file. 
+    operationId: ApplyEffect
+    parameters:
+      - name: audioId
+        in: path
+        required: true
+        description: The unique identifier of the audio file to analyze.
+        schema:
+          type: string
+          format: uuid
+      - name: saveAsNew
+        in: query
+        required: false
+        description: Whether to save the modified audio as a new file. If false, the original file will be overwritten.
+        schema:
+          type: boolean
+          default: true
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../server.yaml#/components/schemas/EffectInfo'
+    responses:
+      '200':
+        description: Audio effect applied successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../server.yaml#/components/schemas/AudioMeta'
+      '400':
+        $ref: '../server.yaml#/components/responses/BadRequest'
+      '500':
+        $ref: '../server.yaml#/components/responses/InternalServerError'
+      '503':
+        $ref: '../server.yaml#/components/responses/ServiceUnavailable'
+
+undoEffect:
+  post:
+    summary: Undo the last applied audio effect
+    description: Undo the last applied audio effect on an audio file and return the modified audio file.
+    operationId: UndoEffect
+    parameters:
+      - name: audioId
+        in: path
+        required: true
+        description: The unique identifier of the audio file to analyze.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      '200':
+        description: Last applied audio effect undone successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id]
+              properties:
+                id:
+                  type: string
+                  description: The unique identifier of the audio file after undoing the last effect.
+                  format: uuid
+      '404':
+        $ref: '../server.yaml#/components/responses/NotFound'
+      '500':
+        $ref: '../server.yaml#/components/responses/InternalServerError'
+      '503':
+        $ref: '../server.yaml#/components/responses/ServiceUnavailable'
+
+applyEffectChain:
+  post:
+    summary: Apply a chain of audio effects to an audio file
+    description: Apply a sequence of audio effects to an audio file and return the modified audio file.
+    operationId: ApplyEffectChain
+    parameters:
+      - name: audioId
+        in: path
+        required: true
+        description: The unique identifier of the audio file to analyze.
+        schema:
+          type: string
+          format: uuid
+      - name: saveAsNew
+        in: query
+        required: false
+        description: Whether to save the modified audio as a new file. If false, the original file will be overwritten.
+        schema:
+          type: boolean
+          default: true
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../server.yaml#/components/schemas/EffectStep'
+    responses:
+      '200':
+        description: Audio effect chain applied successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, applied_effects, metadata]
+              properties:
+                id:
+                  type: string
+                  description: The unique identifier of the audio file after applying the effect chain.
+                  format: uuid
+                applied_effects:
+                  type: array
+                  description: A list of the effects that were applied in the order they were applied.
+                  items:
+                    $ref: '../server.yaml#/components/schemas/EffectStep'
+                metadata:
+                  $ref: '../server.yaml#/components/schemas/AudioMeta'
+      '400':
+        $ref: '../server.yaml#/components/responses/BadRequest'
+      '500':
+        $ref: '../server.yaml#/components/responses/InternalServerError'
+      '503':
+        $ref: '../server.yaml#/components/responses/ServiceUnavailable'
+
+getEffectHistory:
+  get:
+    summary: Get the history of applied audio effects
+    description: Retrieve the history of audio effects that have been applied to an audio file.
+    operationId: GetEffectHistory
+    parameters:
+      - name: audioId
+        in: path
+        required: true
+        description: The unique identifier of the audio file to analyze.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      '200':
+        description: Audio effect history retrieved successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, history, rootAudioId]
+              properties:
+                id:
+                  type: string
+                  description: The unique identifier of the audio file.
+                  format: uuid
+                history:
+                  type: array
+                  items:
+                    $ref: '../server.yaml#/components/schemas/EffectHistoryItem'
+                rootAudioId:
+                  type: string
+                  description: The unique identifier of the original audio file before any effects were applied.
+                  format: uuid
+      '404':
+        $ref: '../server.yaml#/components/responses/NotFound'
+      '500':
+        $ref: '../server.yaml#/components/responses/InternalServerError'
+      '503':
+        $ref: '../server.yaml#/components/responses/ServiceUnavailable'

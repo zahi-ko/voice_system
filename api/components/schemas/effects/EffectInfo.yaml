@@ -1,0 +1,86 @@
+EffectInfo:
+  type: object
+  title: Effect Information
+  description: Information about an audio effect applied to an audio file.
+  allOf:
+    - $ref: '#/EffectEntityBase'
+
+EffectEntityBase:
+  type: object
+  oneOf:
+    - $ref: '#/ReverbEffect'
+    - $ref: '#/GainEffect'
+    - $ref: '#/TempoEffect'
+    - $ref: '#/NormalizationEffect'
+  discriminator:
+    propertyName: name
+    mapping:
+      reverb: '#/ReverbEffect'
+      gain: '#/GainEffect'
+      tempo: '#/TempoEffect'
+      tempo_ola: '#/TempoEffect'
+      normalization: '#/NormalizationEffect'
+
+EffectBase:
+  type: object
+  properties:
+    title:
+      type: string
+      description: A human-readable title for the effect, typically a translated name.
+      default: ""
+    description:
+      type: string
+      description: A detailed description of what the effect does.
+      default: ""
+
+ReverbEffect:
+  allOf:
+    - $ref: '#/EffectBase'
+    - type: object
+      required: [name, parameters]
+      properties:
+        name:
+          type: string
+          description: The unique name of the effect.
+          enum: [reverb]
+        parameters:
+          $ref: './Parameters.yaml#/emptyParams'
+
+GainEffect:
+  allOf:
+    - $ref: '#/EffectBase'
+    - type: object
+      required: [name, parameters]
+      properties:
+        name:
+          type: string
+          description: The unique name of the effect.
+          enum: [gain]
+        parameters:
+          $ref: './Parameters.yaml#/gainParams'
+
+TempoEffect:
+  allOf:
+    - $ref: '#/EffectBase'
+    - type: object
+      required: [name, parameters]
+      properties:
+        name:
+          type: string
+          description: The unique name of the effect.
+          enum: [tempo, tempo_ola]
+        parameters:
+          $ref: './Parameters.yaml#/tempoParams'
+
+NormalizationEffect:
+  allOf:
+    - $ref: '#/EffectBase'
+    - type: object
+      required: [name, parameters]
+      properties:
+        name:
+          type: string
+          description: The unique name of the effect.
+          enum: [normalization]
+        parameters:
+          $ref: './Parameters.yaml#/normalizationParams'
