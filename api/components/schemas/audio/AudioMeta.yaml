@@ -1,7 +1,7 @@
 type: object
 title: Audio File Metadata
 description: Metadata information about an audio file.
-required: [id, sample_rate, channels, duration, created_at, name]
+required: [id, sample_rate, channels, duration, name]
 properties:
   id:
     type: string
@@ -22,11 +22,6 @@ properties:
     type: number
     description: The duration of the audio file in seconds.
     exclusiveMinimum: 0
-    readOnly: true
-  created_at:
-    type: string
-    format: date-time
-    description: The timestamp when the audio file was created.
     readOnly: true
   name:
     type: string

@@ -3,18 +3,22 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/labstack/echo/v5"
+	"voice_system/internal/application"
 	"voice_system/internal/transport/http/generated"
+
+	"github.com/labstack/echo/v5"
 )
 
 // Handler contains the HTTP handlers for the API.
-type Handler struct{}
+type Handler struct {
+	audioService *application.AudioService
+}
 
 var _ generated.ServerInterface = (*Handler)(nil)
 
 // NewHandler creates an API handler skeleton.
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(audioService *application.AudioService) *Handler {
+	return &Handler{audioService: audioService}
 }
 
 // Register attaches all generated API routes to the supplied Echo router.
