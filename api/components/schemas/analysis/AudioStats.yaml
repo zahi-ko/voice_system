@@ -1,7 +1,7 @@
 type: object
 title: Basic Audio Statistics
 description: Basic statistics about an audio file.
-required: [id, duration, sampleRate, channels, rms, peak]
+required: [id, duration, sampleRate, rms, peak]
 properties:
   id:
     type: string
@@ -13,11 +13,6 @@ properties:
   sampleRate:
     type: integer
     description: The sample rate of the audio file in Hz.
-    readonly: true
-  channels:
-    type: integer
-    description: The number of audio channels in the file.
-    enum: [1, 2]
     readonly: true
   rms:
     type: number

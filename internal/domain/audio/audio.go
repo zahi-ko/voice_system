@@ -6,11 +6,11 @@ type Audio struct {
 	ID         string
 	Name       string
 	Format     Format
-	Channels   uint8
 	SampleRate uint32
 	Duration   float32
 }
 
+// Mono only
 type AudioData []int
 
 type AudioList struct {
@@ -33,7 +33,6 @@ func New(id, name string, metadata Metadata) (Audio, error) {
 		ID:         id,
 		Name:       name,
 		Format:     metadata.Format,
-		Channels:   metadata.Channels,
 		SampleRate: metadata.SampleRate,
 		Duration:   metadata.Duration,
 	}, nil

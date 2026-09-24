@@ -14,30 +14,11 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/labstack/echo/v5"
 	"github.com/oapi-codegen/runtime"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
-
-// Defines values for AudioMetaChannels.
-const (
-	AudioMetaChannelsN1 AudioMetaChannels = 1
-	AudioMetaChannelsN2 AudioMetaChannels = 2
-)
-
-// Valid indicates whether the value is a known member of the AudioMetaChannels enum.
-func (e AudioMetaChannels) Valid() bool {
-	switch e {
-	case AudioMetaChannelsN1:
-		return true
-	case AudioMetaChannelsN2:
-		return true
-	default:
-		return false
-	}
-}
 
 // Defines values for AudioMetaSampleRate.
 const (
@@ -60,24 +41,6 @@ func (e AudioMetaSampleRate) Valid() bool {
 	case N48000:
 		return true
 	case N8000:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for AudioStatsChannels.
-const (
-	AudioStatsChannelsN1 AudioStatsChannels = 1
-	AudioStatsChannelsN2 AudioStatsChannels = 2
-)
-
-// Valid indicates whether the value is a known member of the AudioStatsChannels enum.
-func (e AudioStatsChannels) Valid() bool {
-	switch e {
-	case AudioStatsChannelsN1:
-		return true
-	case AudioStatsChannelsN2:
 		return true
 	default:
 		return false
@@ -220,12 +183,6 @@ type AudioList struct {
 
 // AudioMeta Metadata information about an audio file.
 type AudioMeta struct {
-	// Channels The number of audio channels (1 for mono, 2 for stereo).
-	Channels *AudioMetaChannels `json:"channels,omitempty"`
-
-	// CreatedAt The timestamp when the audio file was created.
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-
 	// Duration The duration of the audio file in seconds.
 	Duration *float32 `json:"duration,omitempty"`
 
@@ -239,35 +196,26 @@ type AudioMeta struct {
 	SampleRate *AudioMetaSampleRate `json:"sample_rate,omitempty"`
 }
 
-// AudioMetaChannels The number of audio channels (1 for mono, 2 for stereo).
-type AudioMetaChannels int
-
 // AudioMetaSampleRate The sample rate of the audio file in Hz
 type AudioMetaSampleRate int
 
 // AudioStats Basic statistics about an audio file.
 type AudioStats struct {
-	// Channels The number of audio channels in the file.
-	Channels AudioStatsChannels `json:"channels"`
-
 	// Duration The duration of the audio file in seconds.
-	Duration float32 `json:"duration"`
+	Duration *float32 `json:"duration,omitempty"`
 
 	// ID Unique identifier for the audio file.
 	ID string `json:"id"`
 
 	// Peak The peak amplitude of the audio signal.
-	Peak float32 `json:"peak"`
+	Peak *float32 `json:"peak,omitempty"`
 
 	// Rms The root mean square (RMS) value of the audio signal.
-	Rms float32 `json:"rms"`
+	Rms *float32 `json:"rms,omitempty"`
 
 	// SampleRate The sample rate of the audio file in Hz.
-	SampleRate int `json:"sampleRate"`
+	SampleRate *int `json:"sampleRate,omitempty"`
 }
-
-// AudioStatsChannels The number of audio channels in the file.
-type AudioStatsChannels int
 
 // EffectBase defines model for EffectBase.
 type EffectBase struct {

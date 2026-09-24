@@ -511,9 +511,7 @@ components:
       required:
         - id
         - sample_rate
-        - channels
         - duration
-        - created_at
         - name
       properties:
         id:
@@ -531,22 +529,10 @@ components:
             - 48000
           default: 44100
           readOnly: true
-        channels:
-          type: integer
-          description: The number of audio channels (1 for mono, 2 for stereo).
-          enum:
-            - 1
-            - 2
-          readOnly: true
         duration:
           type: number
           description: The duration of the audio file in seconds.
           exclusiveMinimum: 0
-          readOnly: true
-        created_at:
-          type: string
-          format: date-time
-          description: The timestamp when the audio file was created.
           readOnly: true
         name:
           type: string
@@ -571,7 +557,6 @@ components:
         - id
         - duration
         - sampleRate
-        - channels
         - rms
         - peak
       properties:
@@ -581,21 +566,19 @@ components:
         duration:
           type: number
           description: The duration of the audio file in seconds.
+          readonly: true
         sampleRate:
           type: integer
           description: The sample rate of the audio file in Hz.
-        channels:
-          type: integer
-          description: The number of audio channels in the file.
-          enum:
-            - 1
-            - 2
+          readonly: true
         rms:
           type: number
           description: The root mean square (RMS) value of the audio signal.
+          readonly: true
         peak:
           type: number
           description: The peak amplitude of the audio signal.
+          readonly: true
     WaveformResponse:
       type: object
       title: Waveform Response

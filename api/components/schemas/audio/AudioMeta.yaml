@@ -1,7 +1,7 @@
 type: object
 title: Audio File Metadata
 description: Metadata information about an audio file.
-required: [id, sample_rate, channels, duration, name]
+required: [id, sample_rate, duration, name]
 properties:
   id:
     type: string
@@ -12,11 +12,6 @@ properties:
     description: The sample rate of the audio file in Hz
     enum: [8000, 16000, 22050, 44100, 48000]
     default: 44100
-    readOnly: true
-  channels:
-    type: integer
-    description: The number of audio channels (1 for mono, 2 for stereo).
-    enum: [1, 2]
     readOnly: true
   duration:
     type: number
