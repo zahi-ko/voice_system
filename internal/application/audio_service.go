@@ -57,3 +57,7 @@ func (s *AudioService) Upload(ctx context.Context, name string, content io.Reade
 func (s *AudioService) List(ctx context.Context) (audio.AudioList, error) {
 	return s.store.List(ctx)
 }
+
+func (s *AudioService) Delete(ctx context.Context, id string) error {
+	return s.store.Delete(ctx, id)
+}

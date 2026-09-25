@@ -42,9 +42,22 @@ func (h *Handler) UploadAudio(ctx *echo.Context) error {
 }
 
 func (h *Handler) RemoveAudio(ctx *echo.Context, audioID openapi_types.UUID) error {
-	return notImplemented()
+	if h.audioService == nil {
+		return echo.NewHTTPError(http.StatusServiceUnavailable, "audio service unavailable")
+	}
+
+	id := transporthttp.APItoUUID(audioID)
+
+	err := h.audioService.Delete(ctx.Request().Context(), id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "The request was invalid or cannot be serverd")
+	}
+
+	return nil
 }
 
 func (h *Handler) DownloadAudio(ctx *echo.Context, audioID openapi_types.UUID) error {
-	return notImplemented()
+	if h.audioService == nil {
+		return echo.NewHTTPError(http.StatusServiceUnavailable, "audio service unavailable")
+	}
 }

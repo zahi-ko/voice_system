@@ -30,7 +30,7 @@ func (s *AudioStore) Save(ctx context.Context, item audio.Audio, content io.Read
 	default:
 	}
 
-	path := filepath.Join(s.root, item.ID+filepath.Ext(item.Name))
+	path := filepath.Join(s.root, item.ID)
 	file, err := os.Create(path)
 	if err != nil {
 		return fmt.Errorf("create audio file: %w", err)
@@ -62,7 +62,7 @@ func (s *AudioStore) Get(ctx context.Context, id string) (audio.Audio, io.ReadCl
 		return audio.Audio{}, nil, fmt.Errorf("audio not found")
 	}
 
-	path := filepath.Join(s.root, item.ID+filepath.Ext(item.Name))
+	path := filepath.Join(s.root, item.ID)
 	file, err := os.Open(path)
 	if err != nil {
 		return audio.Audio{}, nil, fmt.Errorf("open audio file: %w", err)
@@ -87,4 +87,25 @@ func (s *AudioStore) List(ctx context.Context) (audio.AudioList, error) {
 	}
 
 	return audio.AudioList{Items: items}, nil
+}
+
+func (s *AudioStore) Delete(ctx context.Context, id string) error {
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	delete(s.items, id)
+	path := filepath.Join(s.root, id)
+	err := os.Remove(path)
+
+	if err != nil {
+		return fmt.Errorf("remove file: %w", err)
+	}
+
+	return nil
 }

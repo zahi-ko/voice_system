@@ -3,6 +3,8 @@ package http
 import (
 	"voice_system/internal/domain/audio"
 	"voice_system/internal/transport/http/generated"
+
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 func AudioToAPI(item audio.Audio) generated.AudioMeta {
@@ -30,4 +32,8 @@ func AudioListToAPI(items audio.AudioList) generated.AudioList {
 	return generated.AudioList{
 		Items: apiItems,
 	}
+}
+
+func APItoUUID(audioId openapi_types.UUID) string {
+	return audioId.String()
 }
