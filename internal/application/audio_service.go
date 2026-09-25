@@ -32,16 +32,11 @@ func (s *AudioService) Upload(ctx context.Context, name string, content io.Reade
 	if len(data) == 0 || len(data) > maxUploadSize {
 		return audio.Audio{}, fmt.Errorf("upload must be between 1 byte and %d MB", maxUploadSize>>20)
 	}
-	format, err := audio.DetectFormat(data)
-	if err != nil {
-		return audio.Audio{}, fmt.Errorf("detect audio format: %w", err)
-	}
 
 	metadata, err := s.decoder.DecodeMeta(bytes.NewReader(data))
 	if err != nil {
 		return audio.Audio{}, fmt.Errorf("decode audio: %w", err)
 	}
-	metadata.Format = format
 
 	item, err := audio.New(uuid.NewString(), name, metadata)
 	if err != nil {

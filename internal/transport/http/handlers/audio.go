@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"voice_system/internal/domain/audio"
+	"voice_system/internal/transport/http/middleware"
 	transporthttp "voice_system/internal/transport/http"
 
 	"github.com/labstack/echo/v5"
@@ -29,6 +30,7 @@ func (h *Handler) ListAudio(ctx *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "The request was invalid or cannot be served.")
 	}
 
+	middleware.SetDetail(ctx, "count=%d", len(audioList.Items))
 	return ctx.JSON(http.StatusOK, transporthttp.AudioListToAPI(audioList))
 }
 
@@ -48,6 +50,8 @@ func (h *Handler) UploadAudio(ctx *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
+	middleware.SetDetail(ctx, "name=%s fmt=%s size=%s dur=%.1fs",
+		item.Name, item.Meta.Format, middleware.HumanSize(header.Size), item.Meta.Duration)
 	return ctx.JSON(http.StatusCreated, transporthttp.AudioToAPI(item))
 }
 
@@ -100,6 +104,8 @@ func (h *Handler) DownloadAudio(ctx *echo.Context, audioID openapi_types.UUID) e
 
 	name := a.Name + "." + string(a.Meta.Format)
 	modtime := info.ModTime()
+
+	middleware.SetDetail(ctx, "name=%s size=%s", name, middleware.HumanSize(info.Size()))
 
 	ctx.Response().Header().Set(echo.HeaderContentType, mime)
 	// ctx.Response().Header().Set(echo.HeaderContentDisposition,
