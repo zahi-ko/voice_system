@@ -16,6 +16,7 @@ const maxUploadSize = 100 << 20
 
 type AudioService struct {
 	decoder ports.AudioDecoder
+	encoder ports.AudioEncoder
 	store   ports.AudioStore
 }
 

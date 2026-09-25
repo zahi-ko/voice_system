@@ -8,14 +8,16 @@ import (
 func AudioToAPI(item audio.Audio) generated.AudioMeta {
 	id := item.ID
 	name := item.Name
-	sampleRate := generated.AudioMetaSampleRate(item.SampleRate)
-	duration := item.Duration
+	sampleRate := generated.AudioMetaSampleRate(item.Meta.SampleRate)
+	duration := item.Meta.Duration
+	bitDepth := item.Meta.BitDepth
 
 	return generated.AudioMeta{
 		ID:         &id,
 		Name:       &name,
 		SampleRate: &sampleRate,
 		Duration:   &duration,
+		BitDepth:   int(bitDepth),
 	}
 }
 

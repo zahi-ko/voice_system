@@ -1,7 +1,7 @@
 type: object
 title: Audio File Metadata
 description: Metadata information about an audio file.
-required: [id, sample_rate, duration, name]
+required: [id, sample_rate, duration, name, bit_depth]
 properties:
   id:
     type: string
@@ -22,3 +22,6 @@ properties:
     type: string
     description: The name of the audio file.
     readOnly: true
+  bit_depth:
+    type: integer
+    description: The bit depth of the audio file

@@ -513,6 +513,7 @@ components:
         - sample_rate
         - duration
         - name
+        - bit_depth
       properties:
         id:
           type: string
@@ -538,6 +539,9 @@ components:
           type: string
           description: The name of the audio file.
           readOnly: true
+        bit_depth:
+          type: integer
+          description: The bit depth of the audio file
     AudioList:
       type: object
       title: List of Audio Files

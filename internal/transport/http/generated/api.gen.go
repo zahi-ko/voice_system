@@ -183,6 +183,9 @@ type AudioList struct {
 
 // AudioMeta Metadata information about an audio file.
 type AudioMeta struct {
+	// BitDepth The bit depth of the audio file
+	BitDepth int `json:"bit_depth"`
+
 	// Duration The duration of the audio file in seconds.
 	Duration *float32 `json:"duration,omitempty"`
 

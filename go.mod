@@ -8,7 +8,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/labstack/echo/v5 v5.3.1
 	github.com/oapi-codegen/runtime v1.7.0
-	github.com/zahi-ko/audiomorph v0.0.0-20260924134234-236d893fec0d
+	github.com/zahi-ko/audiomorph v1.0.1
 )
 
 require (
