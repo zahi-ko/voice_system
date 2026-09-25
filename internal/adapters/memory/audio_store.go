@@ -71,6 +71,24 @@ func (s *AudioStore) Get(ctx context.Context, id string) (audio.Audio, io.ReadCl
 	return item, file, nil
 }
 
+func (s *AudioStore) GetInfo(ctx context.Context, id string) (audio.Audio, error) {
+	select {
+	case <-ctx.Done():
+		return audio.Audio{}, ctx.Err()
+	default:
+	}
+
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	item, ok := s.items[id]
+	if !ok {
+		return audio.Audio{}, fmt.Errorf("audio not found")
+	}
+
+	return item, nil
+}
+
 func (s *AudioStore) GetPath(ctx context.Context, id string) (string, error) {
 	select {
 	case <-ctx.Done():

@@ -1,2 +1,9 @@
 .vscode
-./api/bundled.yaml
+.workbuddy
+
+api/bundled.yaml
+
+tests/data
+
+tmp
+web

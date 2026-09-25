@@ -3,8 +3,6 @@ module voice_system
 go 1.27.1
 
 require (
-	github.com/go-audio/audio v1.0.0
-	github.com/go-audio/wav v1.1.0
 	github.com/google/uuid v1.6.0
 	github.com/labstack/echo/v5 v5.3.1
 	github.com/oapi-codegen/runtime v1.7.0
@@ -18,7 +16,9 @@ require (
 	github.com/faiface/beep v1.1.0 // indirect
 	github.com/getkin/kin-openapi v0.142.0 // indirect
 	github.com/go-audio/aiff v1.1.0 // indirect
+	github.com/go-audio/audio v1.0.0 // indirect
 	github.com/go-audio/riff v1.0.0 // indirect
+	github.com/go-audio/wav v1.1.0 // indirect
 	github.com/go-openapi/jsonpointer v0.23.1 // indirect
 	github.com/go-openapi/swag/jsonname v0.26.0 // indirect
 	github.com/hajimehoshi/go-mp3 v0.3.4 // indirect

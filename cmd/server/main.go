@@ -20,6 +20,7 @@ func main() {
 	service := application.NewAudioService(audioio.NewDecoder(), store)
 	handler := handlers.NewHandler(service)
 	handlers.Register(e, handler)
+	e.Static("/", "web/dist")
 
 	if err := e.Start(":8080"); err != nil {
 		log.Fatal(err)

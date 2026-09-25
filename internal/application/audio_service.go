@@ -70,3 +70,12 @@ func (s *AudioService) Download(ctx context.Context, id string) (string, error) 
 
 	return a, nil
 }
+
+func (s *AudioService) Lookup(ctx context.Context, id string) (audio.Audio, error) {
+	a, err := s.store.GetInfo(ctx, id)
+	if err != nil {
+		return audio.Audio{}, err
+	}
+
+	return a, nil
+}

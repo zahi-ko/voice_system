@@ -2,13 +2,22 @@ package handlers
 
 import (
 	"net/http"
-	"path/filepath"
+	"os"
 
+	"voice_system/internal/domain/audio"
 	transporthttp "voice_system/internal/transport/http"
 
 	"github.com/labstack/echo/v5"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
+
+var mimeMp = map[audio.Format]string{
+	"mp3":  "audio/mpeg",
+	"wav":  "audio/wav",
+	"ogg":  "audio/ogg",
+	"flac": "audio/flac",
+	"aiff": "audio/aiff",
+}
 
 func (h *Handler) ListAudio(ctx *echo.Context) error {
 	if h.audioService == nil {
@@ -54,7 +63,7 @@ func (h *Handler) RemoveAudio(ctx *echo.Context, audioID openapi_types.UUID) err
 		return echo.NewHTTPError(http.StatusNotFound, "The request was invalid or cannot be serverd")
 	}
 
-	return nil
+	return ctx.NoContent(http.StatusNoContent)
 }
 
 func (h *Handler) DownloadAudio(ctx *echo.Context, audioID openapi_types.UUID) error {
@@ -68,5 +77,34 @@ func (h *Handler) DownloadAudio(ctx *echo.Context, audioID openapi_types.UUID) e
 		return echo.NewHTTPError(http.StatusNotFound, "the requested resource is not found")
 	}
 
-	return ctx.Attachment(path, filepath.Base(path))
+	a, err := h.audioService.Lookup(ctx.Request().Context(), id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "audio file not found")
+	}
+
+	mime, ok := mimeMp[a.Meta.Format]
+	if !ok {
+		mime = "application/octet-stream"
+	}
+
+	file, err := os.Open(path)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "file not found")
+	}
+	defer file.Close()
+
+	info, err := file.Stat()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "stat failed")
+	}
+
+	name := a.Name + "." + string(a.Meta.Format)
+	modtime := info.ModTime()
+
+	ctx.Response().Header().Set(echo.HeaderContentType, mime)
+	// ctx.Response().Header().Set(echo.HeaderContentDisposition,
+	// 	fmt.Sprintf(`attachment; filename="%s"`, name))
+
+	http.ServeContent(ctx.Response(), ctx.Request(), name, modtime, file)
+	return nil
 }

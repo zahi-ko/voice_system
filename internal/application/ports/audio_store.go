@@ -9,6 +9,7 @@ import (
 
 type AudioStore interface {
 	Get(context.Context, string) (audio.Audio, io.ReadCloser, error)
+	GetInfo(context.Context, string) (audio.Audio, error)
 	GetPath(context.Context, string) (string, error)
 
 	Save(context.Context, audio.Audio, io.Reader) error
