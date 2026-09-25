@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"path/filepath"
 
 	transporthttp "voice_system/internal/transport/http"
 
@@ -60,4 +61,12 @@ func (h *Handler) DownloadAudio(ctx *echo.Context, audioID openapi_types.UUID) e
 	if h.audioService == nil {
 		return echo.NewHTTPError(http.StatusServiceUnavailable, "audio service unavailable")
 	}
+
+	id := transporthttp.APItoUUID(audioID)
+	path, err := h.audioService.Download(ctx.Request().Context(), id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "the requested resource is not found")
+	}
+
+	return ctx.Attachment(path, filepath.Base(path))
 }

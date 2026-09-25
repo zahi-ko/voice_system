@@ -17,7 +17,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	service := application.NewAudioService(audioio.NewWAVDecoder(), store)
+	service := application.NewAudioService(audioio.NewDecoder(), store)
 	handler := handlers.NewHandler(service)
 	handlers.Register(e, handler)
 

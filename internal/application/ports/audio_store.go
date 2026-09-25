@@ -8,8 +8,11 @@ import (
 )
 
 type AudioStore interface {
-	Save(context.Context, audio.Audio, io.Reader) error
 	Get(context.Context, string) (audio.Audio, io.ReadCloser, error)
-	List(context.Context) (audio.AudioList, error)
+	GetPath(context.Context, string) (string, error)
+
+	Save(context.Context, audio.Audio, io.Reader) error
 	Delete(context.Context, string) error
+
+	List(context.Context) (audio.AudioList, error)
 }

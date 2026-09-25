@@ -61,3 +61,12 @@ func (s *AudioService) List(ctx context.Context) (audio.AudioList, error) {
 func (s *AudioService) Delete(ctx context.Context, id string) error {
 	return s.store.Delete(ctx, id)
 }
+
+func (s *AudioService) Download(ctx context.Context, id string) (string, error) {
+	a, err := s.store.GetPath(ctx, id)
+	if err != nil {
+		return "", err
+	}
+
+	return a, nil
+}
