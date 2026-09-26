@@ -2,23 +2,14 @@ package handlers
 
 import (
 	"net/http"
-	"os"
+	"time"
 
-	"voice_system/internal/domain/audio"
-	"voice_system/internal/transport/http/middleware"
 	transporthttp "voice_system/internal/transport/http"
+	"voice_system/internal/transport/http/middleware"
 
 	"github.com/labstack/echo/v5"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
-
-var mimeMp = map[audio.Format]string{
-	"mp3":  "audio/mpeg",
-	"wav":  "audio/wav",
-	"ogg":  "audio/ogg",
-	"flac": "audio/flac",
-	"aiff": "audio/aiff",
-}
 
 func (h *Handler) ListAudio(ctx *echo.Context) error {
 	if h.audioService == nil {
@@ -76,41 +67,19 @@ func (h *Handler) DownloadAudio(ctx *echo.Context, audioID openapi_types.UUID) e
 	}
 
 	id := transporthttp.APItoUUID(audioID)
-	path, err := h.audioService.Download(ctx.Request().Context(), id)
+	a, data, err := h.audioService.Download(ctx.Request().Context(), id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "the requested resource is not found")
 	}
 
-	a, err := h.audioService.Lookup(ctx.Request().Context(), id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "audio file not found")
-	}
-
-	mime, ok := mimeMp[a.Meta.Format]
-	if !ok {
-		mime = "application/octet-stream"
-	}
-
-	file, err := os.Open(path)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "file not found")
-	}
-	defer file.Close()
-
-	info, err := file.Stat()
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "stat failed")
-	}
-
+	mime := transporthttp.FormatToMIME(a.Meta.Format)
 	name := a.Name + "." + string(a.Meta.Format)
-	modtime := info.ModTime()
+	modtime := time.Time{}
 
-	middleware.SetDetail(ctx, "name=%s size=%s", name, middleware.HumanSize(info.Size()))
+	// middleware.SetDetail(ctx, "name=%s size=%s", name, middleware.HumanSize(info.Size()))
 
 	ctx.Response().Header().Set(echo.HeaderContentType, mime)
-	// ctx.Response().Header().Set(echo.HeaderContentDisposition,
-	// 	fmt.Sprintf(`attachment; filename="%s"`, name))
 
-	http.ServeContent(ctx.Response(), ctx.Request(), name, modtime, file)
+	http.ServeContent(ctx.Response(), ctx.Request(), name, modtime, data)
 	return nil
 }

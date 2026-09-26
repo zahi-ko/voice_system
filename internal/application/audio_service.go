@@ -1,10 +1,11 @@
 package application
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
+	"path/filepath"
+	"strings"
 
 	"voice_system/internal/application/ports"
 	"voice_system/internal/domain/audio"
@@ -24,25 +25,24 @@ func NewAudioService(decoder ports.AudioDecoder, store ports.AudioStore) *AudioS
 	return &AudioService{decoder: decoder, store: store}
 }
 
-func (s *AudioService) Upload(ctx context.Context, name string, content io.Reader) (audio.Audio, error) {
-	data, err := io.ReadAll(io.LimitReader(content, maxUploadSize+1))
+func (s *AudioService) Upload(ctx context.Context, name string, content io.ReadSeeker) (audio.Audio, error) {
+	// data, err := s.decoder.Decode(content)
+	metadata, err := s.decoder.DecodeMeta(content)
 	if err != nil {
-		return audio.Audio{}, fmt.Errorf("read upload: %w", err)
-	}
-	if len(data) == 0 || len(data) > maxUploadSize {
-		return audio.Audio{}, fmt.Errorf("upload must be between 1 byte and %d MB", maxUploadSize>>20)
+		return audio.Audio{}, fmt.Errorf("decode audio metadata: %w", err)
 	}
 
-	metadata, err := s.decoder.DecodeMeta(bytes.NewReader(data))
+	data, err := s.decoder.Decode(content)
 	if err != nil {
-		return audio.Audio{}, fmt.Errorf("decode audio: %w", err)
+		return audio.Audio{}, fmt.Errorf("decode audio data: %w", err)
 	}
 
-	item, err := audio.New(uuid.NewString(), name, metadata)
+	fname := strings.TrimSuffix(name, filepath.Ext(name))
+	item, err := audio.New(uuid.NewString(), fname, metadata)
 	if err != nil {
 		return audio.Audio{}, err
 	}
-	if err := s.store.Save(ctx, item, bytes.NewReader(data)); err != nil {
+	if err := s.store.Save(ctx, item, data); err != nil {
 		return audio.Audio{}, fmt.Errorf("save audio: %w", err)
 	}
 
@@ -57,20 +57,18 @@ func (s *AudioService) Delete(ctx context.Context, id string) error {
 	return s.store.Delete(ctx, id)
 }
 
-func (s *AudioService) Download(ctx context.Context, id string) (string, error) {
-	a, err := s.store.GetPath(ctx, id)
+func (s *AudioService) Download(ctx context.Context, id string) (audio.Audio, io.ReadSeeker, error) {
+	audioMeta, audioData, err := s.store.Get(ctx, id)
 	if err != nil {
-		return "", err
+		return audio.Audio{}, nil, err
 	}
 
-	return a, nil
-}
-
-func (s *AudioService) Lookup(ctx context.Context, id string) (audio.Audio, error) {
-	a, err := s.store.GetInfo(ctx, id)
+	// 编码为具体文件格式
+	data, err := s.encoder.Encode(audioData, audioMeta.Meta)
 	if err != nil {
-		return audio.Audio{}, err
+		return audio.Audio{}, nil, fmt.Errorf("encode audio: %w", err)
 	}
 
-	return a, nil
+	return audioMeta, data, nil
+
 }

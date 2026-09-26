@@ -2,17 +2,15 @@ package ports
 
 import (
 	"context"
-	"io"
 
 	"voice_system/internal/domain/audio"
 )
 
 type AudioStore interface {
-	Get(context.Context, string) (audio.Audio, io.ReadCloser, error)
+	Get(context.Context, string) (audio.Audio, audio.AudioData, error)
 	GetInfo(context.Context, string) (audio.Audio, error)
-	GetPath(context.Context, string) (string, error)
 
-	Save(context.Context, audio.Audio, io.Reader) error
+	Save(context.Context, audio.Audio, audio.AudioData) error
 	Delete(context.Context, string) error
 
 	List(context.Context) (audio.AudioList, error)

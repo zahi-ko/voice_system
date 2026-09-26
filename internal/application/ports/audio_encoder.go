@@ -7,5 +7,5 @@ import (
 )
 
 type AudioEncoder interface {
-	Encode(audio.AudioData, audio.Metadata) (io.Reader, error)
+	Encode(audio.AudioData, audio.Metadata) (io.ReadSeeker, error)
 }

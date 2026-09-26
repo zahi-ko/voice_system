@@ -7,6 +7,23 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+func FormatToMIME(format audio.Format) string {
+	switch format {
+	case "mp3":
+		return "audio/mpeg"
+	case "wav":
+		return "audio/wav"
+	case "ogg":
+		return "audio/ogg"
+	case "flac":
+		return "audio/flac"
+	case "aiff":
+		return "audio/aiff"
+	default:
+		return "application/octet-stream"
+	}
+}
+
 func AudioToAPI(item audio.Audio) generated.AudioMeta {
 	id := item.ID
 	name := item.Name

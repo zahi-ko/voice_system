@@ -20,7 +20,7 @@ func main() {
 	e.Logger = slog.New(slog.NewTextHandler(io.Discard, nil))
 	e.Use(middleware.RequestLogger())
 
-	store, err := memory.NewAudioStore("./tmp")
+	store, err := memory.NewAudioStore()
 	if err != nil {
 		log.Fatal(err)
 	}

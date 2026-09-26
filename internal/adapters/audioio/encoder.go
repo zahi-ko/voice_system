@@ -15,7 +15,7 @@ func NewEncoder() *Encoder {
 	return &Encoder{}
 }
 
-func (encoder *Encoder) Encode(data audio.AudioData, metadata audio.Metadata) (io.Reader, error) {
+func (encoder *Encoder) Encode(data audio.AudioData, metadata audio.Metadata) (io.ReadSeeker, error) {
 	a := &audiomorph.Audio{
 		SampleRate: int(metadata.SampleRate),
 		BitDepth:   int(metadata.BitDepth),

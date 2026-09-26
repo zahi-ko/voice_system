@@ -2,8 +2,8 @@ package memory
 
 import (
 	"context"
+	"encoding/gob"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"sync"
@@ -16,14 +16,15 @@ type AudioStore struct {
 	items map[string]audio.Audio
 }
 
-func NewAudioStore(root string) (*AudioStore, error) {
-	if err := os.MkdirAll(root, 0o755); err != nil {
+func NewAudioStore() (*AudioStore, error) {
+	root, err := os.MkdirTemp("", "audio")
+	if err != nil {
 		return nil, err
 	}
 	return &AudioStore{root: root, items: make(map[string]audio.Audio)}, nil
 }
 
-func (s *AudioStore) Save(ctx context.Context, item audio.Audio, content io.Reader) error {
+func (s *AudioStore) Save(ctx context.Context, item audio.Audio, audioData audio.AudioData) error {
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
@@ -37,7 +38,9 @@ func (s *AudioStore) Save(ctx context.Context, item audio.Audio, content io.Read
 	}
 	defer file.Close()
 
-	if _, err := io.Copy(file, content); err != nil {
+	// 采用序列化保存[]float32数据
+	enc := gob.NewEncoder(file)
+	if err := enc.Encode(audioData); err != nil {
 		_ = os.Remove(path)
 		return fmt.Errorf("write audio file: %w", err)
 	}
@@ -48,7 +51,7 @@ func (s *AudioStore) Save(ctx context.Context, item audio.Audio, content io.Read
 	return nil
 }
 
-func (s *AudioStore) Get(ctx context.Context, id string) (audio.Audio, io.ReadCloser, error) {
+func (s *AudioStore) Get(ctx context.Context, id string) (audio.Audio, audio.AudioData, error) {
 	select {
 	case <-ctx.Done():
 		return audio.Audio{}, nil, ctx.Err()
@@ -67,8 +70,15 @@ func (s *AudioStore) Get(ctx context.Context, id string) (audio.Audio, io.ReadCl
 	if err != nil {
 		return audio.Audio{}, nil, fmt.Errorf("open audio file: %w", err)
 	}
+	defer file.Close()
 
-	return item, file, nil
+	var audioData audio.AudioData
+	dec := gob.NewDecoder(file)
+	if err := dec.Decode(&audioData); err != nil {
+		return audio.Audio{}, nil, fmt.Errorf("read audio file: %w", err)
+	}
+
+	return item, audioData, nil
 }
 
 func (s *AudioStore) GetInfo(ctx context.Context, id string) (audio.Audio, error) {
@@ -87,24 +97,6 @@ func (s *AudioStore) GetInfo(ctx context.Context, id string) (audio.Audio, error
 	}
 
 	return item, nil
-}
-
-func (s *AudioStore) GetPath(ctx context.Context, id string) (string, error) {
-	select {
-	case <-ctx.Done():
-		return "", ctx.Err()
-	default:
-	}
-
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	path := filepath.Join(s.root, id)
-	if _, err := os.Stat(path); err == nil {
-		return filepath.Join(s.root, id), nil
-	} else {
-		return "", fmt.Errorf("check audio file stat: %w", err)
-	}
 }
 
 func (s *AudioStore) List(ctx context.Context) (audio.AudioList, error) {
