@@ -27,6 +27,9 @@ func NewAudioService(decoder ports.AudioDecoder, encoder ports.AudioEncoder, sto
 
 func (s *AudioService) Upload(ctx context.Context, name string, content io.ReadSeeker) (audio.Audio, error) {
 	metadata, err := s.decoder.DecodeMeta(content)
+	if format := metadata.Format; format == "ogg" {
+		metadata.Format = "wav"
+	}
 	if err != nil {
 		return audio.Audio{}, fmt.Errorf("decode audio metadata: %w", err)
 	}
