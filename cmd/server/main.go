@@ -24,7 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	service := application.NewAudioService(audioio.NewDecoder(), store)
+	service := application.NewAudioService(audioio.NewDecoder(), audioio.NewEncoder(), store)
 	handler := handlers.NewHandler(service)
 	handlers.Register(e, handler)
 	e.Static("/", "web/dist")

@@ -8,11 +8,14 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"voice_system/internal/adapters/audioio"
 	"voice_system/internal/adapters/memory"
 	"voice_system/internal/application"
+	"voice_system/internal/domain/audio"
+	transporthttp "voice_system/internal/transport/http"
 	"voice_system/internal/transport/http/generated"
 
 	"github.com/labstack/echo/v5"
@@ -34,11 +37,11 @@ func TestAudioEndpointsSupportFixtureFormats(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			store, err := memory.NewAudioStore(t.TempDir())
+			store, err := memory.NewAudioStore()
 			if err != nil {
 				t.Fatal(err)
 			}
-			handler := NewHandler(application.NewAudioService(audioio.NewDecoder(), store))
+			handler := NewHandler(application.NewAudioService(audioio.NewDecoder(), audioio.NewEncoder(), store))
 			router := echo.New()
 			Register(router, handler)
 
@@ -59,8 +62,9 @@ func TestAudioEndpointsSupportFixtureFormats(t *testing.T) {
 			if uploaded.ID == nil || *uploaded.ID == "" {
 				t.Fatal("upload response has no audio ID")
 			}
-			if uploaded.Name == nil || *uploaded.Name != filepath.Base(fixture) {
-				t.Fatalf("upload response name = %v, want %s", uploaded.Name, filepath.Base(fixture))
+			wantName := strings.TrimSuffix(filepath.Base(fixture), filepath.Ext(fixture))
+			if uploaded.Name == nil || *uploaded.Name != wantName {
+				t.Fatalf("upload response name = %v, want %s", uploaded.Name, wantName)
 			}
 
 			listRequest := httptest.NewRequest(http.MethodGet, "/audio", nil)
@@ -83,8 +87,34 @@ func TestAudioEndpointsSupportFixtureFormats(t *testing.T) {
 			if downloadResponse.Code != http.StatusOK {
 				t.Fatalf("download status = %d, want %d", downloadResponse.Code, http.StatusOK)
 			}
-			if !bytes.Equal(downloadResponse.Body.Bytes(), content) {
-				t.Fatal("downloaded audio does not match uploaded fixture")
+			// 上传时音频已解码为归一化 float32 单声道，下载响应是重新编码的产物，
+			// 字节流不可能与原始 fixture 相同（mp3 有损，且重编码为双声道）。
+			// 语义上的往返无损 = 重新编码后的音频能被解回同样的采样率与时长
+			// （解码端会下混回 mono，样本数按采样率换算即为时长）。
+			expectedMIME := transporthttp.FormatToMIME(audio.Format(strings.TrimPrefix(filepath.Ext(fixture), ".")))
+			if got := downloadResponse.Header().Get(echo.HeaderContentType); got != expectedMIME {
+				t.Fatalf("download content-type = %q, want %q", got, expectedMIME)
+			}
+
+			downloadedMeta, err := audioio.NewDecoder().DecodeMeta(bytes.NewReader(downloadResponse.Body.Bytes()))
+			if err != nil {
+				t.Fatalf("decode downloaded audio: %v", err)
+			}
+			if uploaded.SampleRate == nil || downloadedMeta.SampleRate != uint32(*uploaded.SampleRate) {
+				t.Fatalf("downloaded sample rate = %d, want %v", downloadedMeta.SampleRate, uploaded.SampleRate)
+			}
+
+			// flac 编码器写 STREAMINFO 时 NSamples=0，DecodeMeta 时长恒为 0，
+			// 因此时长用全量解码后的样本数验证，同时确认音频内容完整。
+			full, err := audioio.NewDecoder().Decode(bytes.NewReader(downloadResponse.Body.Bytes()))
+			if err != nil {
+				t.Fatalf("decode downloaded audio data: %v", err)
+			}
+			if uploaded.Duration != nil && downloadedMeta.SampleRate > 0 {
+				got := float32(len(full)) / float32(downloadedMeta.SampleRate)
+				if delta := got - *uploaded.Duration; delta < -0.5 || delta > 0.5 {
+					t.Fatalf("downloaded audio duration = %.2fs, want %.2fs (±0.5s)", got, *uploaded.Duration)
+				}
 			}
 
 			deleteRequest := httptest.NewRequest(http.MethodDelete, "/audio/"+*uploaded.ID, nil)

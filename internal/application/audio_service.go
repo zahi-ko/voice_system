@@ -21,12 +21,11 @@ type AudioService struct {
 	store   ports.AudioStore
 }
 
-func NewAudioService(decoder ports.AudioDecoder, store ports.AudioStore) *AudioService {
-	return &AudioService{decoder: decoder, store: store}
+func NewAudioService(decoder ports.AudioDecoder, encoder ports.AudioEncoder, store ports.AudioStore) *AudioService {
+	return &AudioService{decoder: decoder, encoder: encoder, store: store}
 }
 
 func (s *AudioService) Upload(ctx context.Context, name string, content io.ReadSeeker) (audio.Audio, error) {
-	// data, err := s.decoder.Decode(content)
 	metadata, err := s.decoder.DecodeMeta(content)
 	if err != nil {
 		return audio.Audio{}, fmt.Errorf("decode audio metadata: %w", err)
