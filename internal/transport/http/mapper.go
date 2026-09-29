@@ -54,3 +54,11 @@ func AudioListToAPI(items audio.AudioList) generated.AudioList {
 func APItoUUID(audioId openapi_types.UUID) string {
 	return audioId.String()
 }
+
+func APItoSaveAsNew(saveAsNew generated.ApplyEffectParams) bool {
+	save := saveAsNew.SaveAsNew
+	if save == nil {
+		return false
+	}
+	return *save
+}

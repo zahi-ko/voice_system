@@ -4,14 +4,16 @@ import (
 	"voice_system/internal/domain/audio"
 )
 
-type EffectReverse struct{}
+type EffectReverse struct {
+	Name  string           `json:"name"`
+	Param ParameterReverse `json:"parameters"`
+}
 
-func NewReverse() EffectReverse { return EffectReverse{} }
+type ParameterReverse struct{}
 
-func (e EffectReverse) Name() string { return "reverse" }
+func NewReverse() EffectReverse { return EffectReverse{Name: "reverse", Param: ParameterReverse{}} }
 
 func (e EffectReverse) Apply(data audio.AudioData, meta audio.Metadata) (audio.AudioData, audio.Metadata, error) {
-	// TODO: 样本倒序输出；注意 API oneOf 目前未含 reverse，仅为域内预留。
 	out := reversed(data)
 	return out, meta, nil
 }

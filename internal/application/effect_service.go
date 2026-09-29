@@ -7,30 +7,22 @@ import (
 	"voice_system/internal/application/commands"
 	"voice_system/internal/application/ports"
 	"voice_system/internal/domain/audio"
-	"voice_system/internal/domain/effects"
 )
 
-// EffectService 负责把效果「作用到一份存储的音频」：
-// decode -> registry 构造 Effect -> Apply（纯内存变换）-> encode -> store。
-// 本层不写任何 DSP 数学；undo 依赖历史版本而非逆运算。
 type EffectService struct {
-	decoder  ports.AudioDecoder
-	encoder  ports.AudioEncoder
+	last     string
 	store    ports.AudioStore
-	registry *effects.Registry
+	registry ports.EffectRegistry
 }
 
 func NewEffectService(
-	decoder ports.AudioDecoder,
-	encoder ports.AudioEncoder,
 	store ports.AudioStore,
-	registry *effects.Registry,
+	registry ports.EffectRegistry,
 ) *EffectService {
 	return &EffectService{
-		decoder:  decoder,
-		encoder:  encoder,
 		store:    store,
 		registry: registry,
+		last:     "",
 	}
 }
 

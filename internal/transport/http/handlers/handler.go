@@ -11,14 +11,18 @@ import (
 
 // Handler contains the HTTP handlers for the API.
 type Handler struct {
-	audioService *application.AudioService
+	audioService  *application.AudioService
+	effectService *application.EffectService
 }
 
 var _ generated.ServerInterface = (*Handler)(nil)
 
 // NewHandler creates an API handler skeleton.
-func NewHandler(audioService *application.AudioService) *Handler {
-	return &Handler{audioService: audioService}
+func NewHandler(audioService *application.AudioService, effectService *application.EffectService) *Handler {
+	return &Handler{
+		audioService:  audioService,
+		effectService: effectService,
+	}
 }
 
 // Register attaches all generated API routes to the supplied Echo router.

@@ -24,8 +24,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	service := application.NewAudioService(audioio.NewDecoder(), audioio.NewEncoder(), store)
-	handler := handlers.NewHandler(service)
+	registry, err := memory.NewRegistry()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	audio_service := application.NewAudioService(audioio.NewDecoder(), audioio.NewEncoder(), store)
+	effect_service := application.NewEffectService(store, registry)
+	handler := handlers.NewHandler(audio_service, effect_service)
 	handlers.Register(e, handler)
 	e.Static("/", "web/dist")
 

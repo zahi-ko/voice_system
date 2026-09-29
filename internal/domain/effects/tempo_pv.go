@@ -10,17 +10,16 @@ import (
 )
 
 type EffectTempoPV struct {
-	param ParameterTempo
+	Name  string         `json:"name"`
+	Param ParameterTempo `json:"parameters"`
 }
 
 func NewTempoPV(p ParameterTempo) (EffectTempoPV, error) {
 	if p.Tempo < 0.5 || p.Tempo > 2.0 {
 		return EffectTempoPV{}, fmt.Errorf("effects: tempo %.2f out of range [0.5, 2.0]", p.Tempo)
 	}
-	return EffectTempoPV{param: p}, nil
+	return EffectTempoPV{Name: "tempo_pv", Param: p}, nil
 }
-
-func (e EffectTempoPV) Name() string { return "tempo_pv" }
 
 func (e EffectTempoPV) Apply(data audio.AudioData, meta audio.Metadata) (audio.AudioData, audio.Metadata, error) {
 	pv, err := NewPhaseVoCoder(2048, 512)
@@ -28,7 +27,7 @@ func (e EffectTempoPV) Apply(data audio.AudioData, meta audio.Metadata) (audio.A
 		return nil, meta, fmt.Errorf("effects: failed to create PhaseVoCoder: %v", err)
 	}
 
-	out, err := pv.Stretch(data, e.param.Tempo)
+	out, err := pv.Stretch(data, e.Param.Tempo)
 	if err != nil {
 		return nil, meta, fmt.Errorf("effects: failed to stretch audio data: %v", err)
 	}
