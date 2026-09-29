@@ -730,7 +730,7 @@ components:
       description: An empty set of parameters.
       additionalProperties: false
       maxProperties: 0
-    ReverbEffect:
+    ReverseEffect:
       allOf:
         - $ref: '#/components/schemas/EffectBase'
         - type: object
@@ -742,7 +742,7 @@ components:
               type: string
               description: The unique name of the effect.
               enum:
-                - reverb
+                - reverse
             parameters:
               $ref: '#/components/schemas/emptyParams'
     gainParams:
@@ -799,7 +799,7 @@ components:
               description: The unique name of the effect.
               enum:
                 - tempo
-                - tempo_ola
+                - tempo_pv
             parameters:
               $ref: '#/components/schemas/tempoParams'
     normalizationParams:
@@ -833,17 +833,17 @@ components:
     EffectEntityBase:
       type: object
       oneOf:
-        - $ref: '#/components/schemas/ReverbEffect'
+        - $ref: '#/components/schemas/ReverseEffect'
         - $ref: '#/components/schemas/GainEffect'
         - $ref: '#/components/schemas/TempoEffect'
         - $ref: '#/components/schemas/NormalizationEffect'
       discriminator:
         propertyName: name
         mapping:
-          reverb: '#/components/schemas/ReverbEffect'
+          reverse: '#/components/schemas/ReverseEffect'
           gain: '#/components/schemas/GainEffect'
           tempo: '#/components/schemas/TempoEffect'
-          tempo_ola: '#/components/schemas/TempoEffect'
+          tempo_pv: '#/components/schemas/TempoEffect'
           normalization: '#/components/schemas/NormalizationEffect'
   responses:
     NotFound:

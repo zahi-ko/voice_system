@@ -1,12 +1,12 @@
-﻿package effects
+package effects
 
 import (
 	"fmt"
+	"math"
 
 	"voice_system/internal/domain/audio"
 )
 
-// ParameterNormalization 与 API normalizationParams 对齐（targetLevel: [-60, 0]）。
 type ParameterNormalization struct {
 	TargetLevel float32 `json:"targetLevel"`
 }
@@ -24,7 +24,27 @@ func NewNormalization(p ParameterNormalization) (EffectNormalization, error) {
 
 func (e EffectNormalization) Name() string { return "normalization" }
 
-func (e EffectNormalization) Apply(data audio.AudioData, _ uint32) (audio.AudioData, error) {
-	// TODO: 求峰值，按 targetLevel 线性缩放至目标电平，返回新缓冲区。
-	return nil, fmt.Errorf("effects: normalization not implemented")
+func (e EffectNormalization) Apply(data audio.AudioData, meta audio.Metadata) (audio.AudioData, audio.Metadata, error) {
+	out := make(audio.AudioData, len(data))
+
+	peak := math.Inf(-1)
+	for _, s := range data {
+		val := math.Abs(s)
+		if val > peak {
+			peak = val
+		}
+	}
+
+	if peak < 1e-9 {
+		copy(out, data)
+		return out, meta, nil
+	}
+
+	target := math.Pow(10, float64(e.param.TargetLevel/20.0))
+	gain := target / peak
+	for i, s := range data {
+		out[i] = s * gain
+	}
+
+	return out, meta, nil
 }

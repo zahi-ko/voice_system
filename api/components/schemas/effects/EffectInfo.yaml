@@ -3,23 +3,23 @@ EffectInfo:
   title: Effect Information
   description: Information about an audio effect applied to an audio file.
   allOf:
-    - $ref: '#/EffectEntityBase'
+    - $ref: "#/EffectEntityBase"
 
 EffectEntityBase:
   type: object
   oneOf:
-    - $ref: '#/ReverbEffect'
-    - $ref: '#/GainEffect'
-    - $ref: '#/TempoEffect'
-    - $ref: '#/NormalizationEffect'
+    - $ref: "#/ReverseEffect"
+    - $ref: "#/GainEffect"
+    - $ref: "#/TempoEffect"
+    - $ref: "#/NormalizationEffect"
   discriminator:
     propertyName: name
     mapping:
-      reverb: '#/ReverbEffect'
-      gain: '#/GainEffect'
-      tempo: '#/TempoEffect'
-      tempo_ola: '#/TempoEffect'
-      normalization: '#/NormalizationEffect'
+      reverse: "#/ReverseEffect"
+      gain: "#/GainEffect"
+      tempo: "#/TempoEffect"
+      tempo_pv: "#/TempoEffect"
+      normalization: "#/NormalizationEffect"
 
 EffectBase:
   type: object
@@ -33,22 +33,22 @@ EffectBase:
       description: A detailed description of what the effect does.
       default: ""
 
-ReverbEffect:
+ReverseEffect:
   allOf:
-    - $ref: '#/EffectBase'
+    - $ref: "#/EffectBase"
     - type: object
       required: [name, parameters]
       properties:
         name:
           type: string
           description: The unique name of the effect.
-          enum: [reverb]
+          enum: [reverse]
         parameters:
-          $ref: './Parameters.yaml#/emptyParams'
+          $ref: "./Parameters.yaml#/emptyParams"
 
 GainEffect:
   allOf:
-    - $ref: '#/EffectBase'
+    - $ref: "#/EffectBase"
     - type: object
       required: [name, parameters]
       properties:
@@ -57,24 +57,24 @@ GainEffect:
           description: The unique name of the effect.
           enum: [gain]
         parameters:
-          $ref: './Parameters.yaml#/gainParams'
+          $ref: "./Parameters.yaml#/gainParams"
 
 TempoEffect:
   allOf:
-    - $ref: '#/EffectBase'
+    - $ref: "#/EffectBase"
     - type: object
       required: [name, parameters]
       properties:
         name:
           type: string
           description: The unique name of the effect.
-          enum: [tempo, tempo_ola]
+          enum: [tempo, tempo_pv]
         parameters:
-          $ref: './Parameters.yaml#/tempoParams'
+          $ref: "./Parameters.yaml#/tempoParams"
 
 NormalizationEffect:
   allOf:
-    - $ref: '#/EffectBase'
+    - $ref: "#/EffectBase"
     - type: object
       required: [name, parameters]
       properties:
@@ -83,4 +83,4 @@ NormalizationEffect:
           description: The unique name of the effect.
           enum: [normalization]
         parameters:
-          $ref: './Parameters.yaml#/normalizationParams'
+          $ref: "./Parameters.yaml#/normalizationParams"

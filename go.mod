@@ -6,7 +6,8 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/labstack/echo/v5 v5.3.1
 	github.com/oapi-codegen/runtime v1.7.0
-	github.com/zahi-ko/audiomorph v1.0.4
+	github.com/zahi-ko/audiomorph v1.1.0
+	gonum.org/v1/gonum v0.17.0
 )
 
 require (

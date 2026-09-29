@@ -77,15 +77,15 @@ func (e NormalizationEffectName) Valid() bool {
 	}
 }
 
-// Defines values for ReverbEffectName.
+// Defines values for ReverseEffectName.
 const (
-	Reverb ReverbEffectName = "reverb"
+	Reverse ReverseEffectName = "reverse"
 )
 
-// Valid indicates whether the value is a known member of the ReverbEffectName enum.
-func (e ReverbEffectName) Valid() bool {
+// Valid indicates whether the value is a known member of the ReverseEffectName enum.
+func (e ReverseEffectName) Valid() bool {
 	switch e {
-	case Reverb:
+	case Reverse:
 		return true
 	default:
 		return false
@@ -94,8 +94,8 @@ func (e ReverbEffectName) Valid() bool {
 
 // Defines values for TempoEffectName.
 const (
-	Tempo    TempoEffectName = "tempo"
-	TempoOla TempoEffectName = "tempo_ola"
+	Tempo   TempoEffectName = "tempo"
+	TempoPv TempoEffectName = "tempo_pv"
 )
 
 // Valid indicates whether the value is a known member of the TempoEffectName enum.
@@ -103,7 +103,7 @@ func (e TempoEffectName) Valid() bool {
 	switch e {
 	case Tempo:
 		return true
-	case TempoOla:
+	case TempoPv:
 		return true
 	default:
 		return false
@@ -288,13 +288,13 @@ type NormalizationEffect struct {
 // NormalizationEffectName The unique name of the effect.
 type NormalizationEffectName string
 
-// ReverbEffect defines model for ReverbEffect.
-type ReverbEffect struct {
+// ReverseEffect defines model for ReverseEffect.
+type ReverseEffect struct {
 	// Description A detailed description of what the effect does.
 	Description *string `json:"description,omitempty"`
 
 	// Name The unique name of the effect.
-	Name ReverbEffectName `json:"name"`
+	Name ReverseEffectName `json:"name"`
 
 	// Parameters An empty set of parameters.
 	Parameters EmptyParams `json:"parameters"`
@@ -303,8 +303,8 @@ type ReverbEffect struct {
 	Title *string `json:"title,omitempty"`
 }
 
-// ReverbEffectName The unique name of the effect.
-type ReverbEffectName string
+// ReverseEffectName The unique name of the effect.
+type ReverseEffectName string
 
 // SpectrogramResponse The response for a spectrogram analysis request.
 type SpectrogramResponse struct {
@@ -468,22 +468,22 @@ type ApplyEffectJSONRequestBody = EffectInfo
 // ApplyEffectChainJSONRequestBody defines body for ApplyEffectChain for application/json ContentType.
 type ApplyEffectChainJSONRequestBody = ApplyEffectChainJSONBody
 
-// AsReverbEffect returns the union data inside the EffectEntityBase as a ReverbEffect
-func (t EffectEntityBase) AsReverbEffect() (ReverbEffect, error) {
-	var body ReverbEffect
+// AsReverseEffect returns the union data inside the EffectEntityBase as a ReverseEffect
+func (t EffectEntityBase) AsReverseEffect() (ReverseEffect, error) {
+	var body ReverseEffect
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromReverbEffect overwrites any union data inside the EffectEntityBase as the provided ReverbEffect
-func (t *EffectEntityBase) FromReverbEffect(v ReverbEffect) error {
+// FromReverseEffect overwrites any union data inside the EffectEntityBase as the provided ReverseEffect
+func (t *EffectEntityBase) FromReverseEffect(v ReverseEffect) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeReverbEffect performs a merge with any union data inside the EffectEntityBase, using the provided ReverbEffect
-func (t *EffectEntityBase) MergeReverbEffect(v ReverbEffect) error {
+// MergeReverseEffect performs a merge with any union data inside the EffectEntityBase, using the provided ReverseEffect
+func (t *EffectEntityBase) MergeReverseEffect(v ReverseEffect) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -590,11 +590,11 @@ func (t EffectEntityBase) ValueByDiscriminator() (interface{}, error) {
 		return t.AsGainEffect()
 	case "normalization":
 		return t.AsNormalizationEffect()
-	case "reverb":
-		return t.AsReverbEffect()
+	case "reverse":
+		return t.AsReverseEffect()
 	case "tempo":
 		return t.AsTempoEffect()
-	case "tempo_ola":
+	case "tempo_pv":
 		return t.AsTempoEffect()
 	default:
 		return nil, errors.New("unknown discriminator value: " + discriminator)

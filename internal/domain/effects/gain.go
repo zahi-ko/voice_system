@@ -1,4 +1,4 @@
-﻿package effects
+package effects
 
 import (
 	"fmt"
@@ -7,7 +7,6 @@ import (
 	"voice_system/internal/domain/audio"
 )
 
-// ParameterGain 与 API gainParams 对齐（db: [-60, 12]）。
 type ParameterGain struct {
 	GainDB float32 `json:"db"`
 }
@@ -27,11 +26,11 @@ func NewGain(p ParameterGain) (EffectGain, error) {
 
 func (e EffectGain) Name() string { return "gain" }
 
-func (e EffectGain) Apply(data audio.AudioData, _ uint32) (audio.AudioData, error) {
-	factor := math.Pow(10, float64(e.param.GainDB)/20)
+func (e EffectGain) Apply(data audio.AudioData, meta audio.Metadata) (audio.AudioData, audio.Metadata, error) {
+	factor := math.Pow(10, float64(e.param.GainDB/20))
 	out := make(audio.AudioData, len(data))
 	for i, s := range data {
-		out[i] = float32(float64(s) * factor)
+		out[i] = s * factor
 	}
-	return out, nil
+	return out, meta, nil
 }

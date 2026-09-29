@@ -6,12 +6,10 @@ import (
 	"voice_system/internal/domain/audio"
 )
 
-// ParameterTempo 与 API tempoParams 对齐（tempo: [0.5, 2.0]）。
 type ParameterTempo struct {
 	Tempo float32 `json:"tempo"`
 }
 
-// EffectTempo 变速不变调（时间伸缩）。API discriminator: "tempo" / "tempo_ola"。
 type EffectTempo struct {
 	param ParameterTempo
 }
@@ -25,7 +23,16 @@ func NewTempo(p ParameterTempo) (EffectTempo, error) {
 
 func (e EffectTempo) Name() string { return "tempo" }
 
-func (e EffectTempo) Apply(data audio.AudioData, sampleRate uint32) (audio.AudioData, error) {
-	// TODO: OLA / WSOLA 时间伸缩，输出长度 = len(data) / tempo。
-	return nil, fmt.Errorf("effects: tempo not implemented")
+// 直接修改采样率即可达到变速变调的效果
+func (e EffectTempo) Apply(data audio.AudioData, meta audio.Metadata) (audio.AudioData, audio.Metadata, error) {
+	out := make(audio.AudioData, len(data))
+	copy(out, data)
+
+	sr := float32(meta.SampleRate)
+	out_sr := sr * e.param.Tempo
+
+	meta.SampleRate = uint32(out_sr)
+	meta.Duration = meta.Duration / e.param.Tempo
+
+	return out, meta, nil
 }

@@ -9,7 +9,7 @@ type Audio struct {
 }
 
 // Mono only
-type AudioData []float32
+type AudioData []float64
 
 type AudioList struct {
 	Items []Audio

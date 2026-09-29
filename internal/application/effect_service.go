@@ -39,7 +39,7 @@ func (s *EffectService) Apply(ctx context.Context, cmd commands.ApplyEffect) (au
 	// TODO:
 	//  1. store.Get 拿到文件流（ReadSeeker），decoder.DecodeMeta 取 sampleRate + Decode 取样本
 	//  2. registry.Build(cmd.Step.Name, cmd.Step.Params) 构造 Effect
-	//  3. eff.Apply(samples, sampleRate) 得到新样本
+	//  3. eff.Apply(samples, meta) 得到新样本和元数据
 	//  4. encoder.Encode -> saveAsNew ? 新 ID 存储 : 覆盖原文件（覆盖前保留旧版本供 undo）
 	//  5. 记录历史（EffectStep + 版本链）
 	return audio.Audio{}, errors.New("effect service: Apply not implemented")
