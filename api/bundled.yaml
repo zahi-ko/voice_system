@@ -369,39 +369,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
         '503':
           $ref: '#/components/responses/ServiceUnavailable'
-  /effects/{audioId}/undo:
-    post:
-      summary: Undo the last applied audio effect
-      description: Undo the last applied audio effect on an audio file and return the modified audio file.
-      operationId: UndoEffect
-      parameters:
-        - name: audioId
-          in: path
-          required: true
-          description: The unique identifier of the audio file to analyze.
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Last applied audio effect undone successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - id
-                properties:
-                  id:
-                    type: string
-                    description: The unique identifier of the audio file after undoing the last effect.
-                    format: uuid
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
   /effects/{audioId}/chain:
     post:
       summary: Apply a chain of audio effects to an audio file
@@ -455,49 +422,6 @@ paths:
                     $ref: '#/components/schemas/AudioMeta'
         '400':
           $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
-  /effects/{audioId}/history:
-    get:
-      summary: Get the history of applied audio effects
-      description: Retrieve the history of audio effects that have been applied to an audio file.
-      operationId: GetEffectHistory
-      parameters:
-        - name: audioId
-          in: path
-          required: true
-          description: The unique identifier of the audio file to analyze.
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Audio effect history retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - id
-                  - history
-                  - rootAudioId
-                properties:
-                  id:
-                    type: string
-                    description: The unique identifier of the audio file.
-                    format: uuid
-                  history:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/EffectHistoryItem'
-                  rootAudioId:
-                    type: string
-                    description: The unique identifier of the original audio file before any effects were applied.
-                    format: uuid
-        '404':
-          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
         '503':
@@ -690,12 +614,6 @@ components:
       type: object
       title: Effect Step
       description: A step in an effect chain, which includes the effect's name and its parameters.
-      allOf:
-        - $ref: '#/components/schemas/EffectEntityBase'
-    EffectHistoryItem:
-      type: object
-      title: Effect History Item
-      description: A record of an effect applied to an audio file
       allOf:
         - $ref: '#/components/schemas/EffectEntityBase'
     Error:

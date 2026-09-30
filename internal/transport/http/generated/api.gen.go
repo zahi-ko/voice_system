@@ -234,9 +234,6 @@ type EffectEntityBase struct {
 	union json.RawMessage
 }
 
-// EffectHistoryItem A record of an effect applied to an audio file
-type EffectHistoryItem = EffectEntityBase
-
 // EffectInfo Information about an audio effect applied to an audio file.
 type EffectInfo = EffectEntityBase
 
@@ -779,26 +776,12 @@ type ClientInterface interface {
 	// Corresponds with POST /effects/{audioId}/chain (the `ApplyEffectChain` operationId).
 	ApplyEffectChain(ctx context.Context, audioID openapi_types.UUID, params *ApplyEffectChainParams, body ApplyEffectChainJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetEffectHistory Get the history of applied audio effects
-	//
-	// Retrieve the history of audio effects that have been applied to an audio file.
-	//
-	// Corresponds with GET /effects/{audioId}/history (the `GetEffectHistory` operationId).
-	GetEffectHistory(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// ListEffects List available audio effects
 	//
 	// Retrieve a list of available audio effects that can be applied to an audio file.
 	//
 	// Corresponds with GET /effects/{audioId}/list (the `ListEffects` operationId).
 	ListEffects(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// UndoEffect Undo the last applied audio effect
-	//
-	// Undo the last applied audio effect on an audio file and return the modified audio file.
-	//
-	// Corresponds with POST /effects/{audioId}/undo (the `UndoEffect` operationId).
-	UndoEffect(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetHealth Health check endpoint
 	//
@@ -1022,23 +1005,6 @@ func (c *Client) ApplyEffectChain(ctx context.Context, audioID openapi_types.UUI
 	return c.Client.Do(req)
 }
 
-// GetEffectHistory Get the history of applied audio effects
-//
-// Retrieve the history of audio effects that have been applied to an audio file.
-//
-// Corresponds with GET /effects/{audioId}/history (the `GetEffectHistory` operationId).
-func (c *Client) GetEffectHistory(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetEffectHistoryRequest(c.Server, audioID)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 // ListEffects List available audio effects
 //
 // Retrieve a list of available audio effects that can be applied to an audio file.
@@ -1046,23 +1012,6 @@ func (c *Client) GetEffectHistory(ctx context.Context, audioID openapi_types.UUI
 // Corresponds with GET /effects/{audioId}/list (the `ListEffects` operationId).
 func (c *Client) ListEffects(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListEffectsRequest(c.Server, audioID)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-// UndoEffect Undo the last applied audio effect
-//
-// Undo the last applied audio effect on an audio file and return the modified audio file.
-//
-// Corresponds with POST /effects/{audioId}/undo (the `UndoEffect` operationId).
-func (c *Client) UndoEffect(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUndoEffectRequest(c.Server, audioID)
 	if err != nil {
 		return nil, err
 	}
@@ -1615,40 +1564,6 @@ func NewApplyEffectChainRequestWithBody(server string, audioID openapi_types.UUI
 	return req, nil
 }
 
-// NewGetEffectHistoryRequest constructs an http.Request for the GetEffectHistory method
-func NewGetEffectHistoryRequest(server string, audioID openapi_types.UUID) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "audioId", audioID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/effects/%s/history", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
 // NewListEffectsRequest constructs an http.Request for the ListEffects method
 func NewListEffectsRequest(server string, audioID openapi_types.UUID) (*http.Request, error) {
 	var err error
@@ -1676,40 +1591,6 @@ func NewListEffectsRequest(server string, audioID openapi_types.UUID) (*http.Req
 	}
 
 	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewUndoEffectRequest constructs an http.Request for the UndoEffect method
-func NewUndoEffectRequest(server string, audioID openapi_types.UUID) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "audioId", audioID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/effects/%s/undo", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, queryURL.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -1896,15 +1777,6 @@ type ClientWithResponsesInterface interface {
 	// Corresponds with POST /effects/{audioId}/chain (the `ApplyEffectChain` operationId).
 	ApplyEffectChainWithResponse(ctx context.Context, audioID openapi_types.UUID, params *ApplyEffectChainParams, body ApplyEffectChainJSONRequestBody, reqEditors ...RequestEditorFn) (*ApplyEffectChainResponse, error)
 
-	// GetEffectHistoryWithResponse Get the history of applied audio effects
-	//
-	// Retrieve the history of audio effects that have been applied to an audio file.
-	//
-	// Returns a wrapper object for the known response body format(s).
-	//
-	// Corresponds with GET /effects/{audioId}/history (the `GetEffectHistory` operationId).
-	GetEffectHistoryWithResponse(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetEffectHistoryResponse, error)
-
 	// ListEffectsWithResponse List available audio effects
 	//
 	// Retrieve a list of available audio effects that can be applied to an audio file.
@@ -1913,15 +1785,6 @@ type ClientWithResponsesInterface interface {
 	//
 	// Corresponds with GET /effects/{audioId}/list (the `ListEffects` operationId).
 	ListEffectsWithResponse(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*ListEffectsResponse, error)
-
-	// UndoEffectWithResponse Undo the last applied audio effect
-	//
-	// Undo the last applied audio effect on an audio file and return the modified audio file.
-	//
-	// Returns a wrapper object for the known response body format(s).
-	//
-	// Corresponds with POST /effects/{audioId}/undo (the `UndoEffect` operationId).
-	UndoEffectWithResponse(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*UndoEffectResponse, error)
 
 	// GetHealthWithResponse Health check endpoint
 	//
@@ -2571,84 +2434,6 @@ func (r ApplyEffectChainResponse) ContentType() string {
 	return ""
 }
 
-type GetEffectHistoryResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	// JSON200 the response for an HTTP 200 `application/json` response
-	JSON200 *struct {
-		History []EffectHistoryItem `json:"history"`
-
-		// ID The unique identifier of the audio file.
-		ID openapi_types.UUID `json:"id"`
-
-		// RootAudioID The unique identifier of the original audio file before any effects were applied.
-		RootAudioID openapi_types.UUID `json:"rootAudioId"`
-	}
-	// JSON404 the response for an HTTP 404 `application/json` response
-	JSON404 *NotFound
-	// JSON500 the response for an HTTP 500 `application/json` response
-	JSON500 *InternalServerError
-	// JSON503 the response for an HTTP 503 `application/json` response
-	JSON503 *ServiceUnavailable
-}
-
-// GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r GetEffectHistoryResponse) GetJSON200() *struct {
-	History []EffectHistoryItem `json:"history"`
-
-	// ID The unique identifier of the audio file.
-	ID openapi_types.UUID `json:"id"`
-
-	// RootAudioID The unique identifier of the original audio file before any effects were applied.
-	RootAudioID openapi_types.UUID `json:"rootAudioId"`
-} {
-	return r.JSON200
-}
-
-// GetJSON404 returns the response for an HTTP 404 `application/json` response
-func (r GetEffectHistoryResponse) GetJSON404() *NotFound {
-	return r.JSON404
-}
-
-// GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r GetEffectHistoryResponse) GetJSON500() *InternalServerError {
-	return r.JSON500
-}
-
-// GetJSON503 returns the response for an HTTP 503 `application/json` response
-func (r GetEffectHistoryResponse) GetJSON503() *ServiceUnavailable {
-	return r.JSON503
-}
-
-// GetBody returns the raw response body bytes
-func (r GetEffectHistoryResponse) GetBody() []byte {
-	return r.Body
-}
-
-// Status returns HTTPResponse.Status
-func (r GetEffectHistoryResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetEffectHistoryResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r GetEffectHistoryResponse) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
-}
-
 type ListEffectsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -2705,74 +2490,6 @@ func (r ListEffectsResponse) StatusCode() int {
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
 func (r ListEffectsResponse) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
-}
-
-type UndoEffectResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	// JSON200 the response for an HTTP 200 `application/json` response
-	JSON200 *struct {
-		// ID The unique identifier of the audio file after undoing the last effect.
-		ID openapi_types.UUID `json:"id"`
-	}
-	// JSON404 the response for an HTTP 404 `application/json` response
-	JSON404 *NotFound
-	// JSON500 the response for an HTTP 500 `application/json` response
-	JSON500 *InternalServerError
-	// JSON503 the response for an HTTP 503 `application/json` response
-	JSON503 *ServiceUnavailable
-}
-
-// GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r UndoEffectResponse) GetJSON200() *struct {
-	// ID The unique identifier of the audio file after undoing the last effect.
-	ID openapi_types.UUID `json:"id"`
-} {
-	return r.JSON200
-}
-
-// GetJSON404 returns the response for an HTTP 404 `application/json` response
-func (r UndoEffectResponse) GetJSON404() *NotFound {
-	return r.JSON404
-}
-
-// GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r UndoEffectResponse) GetJSON500() *InternalServerError {
-	return r.JSON500
-}
-
-// GetJSON503 returns the response for an HTTP 503 `application/json` response
-func (r UndoEffectResponse) GetJSON503() *ServiceUnavailable {
-	return r.JSON503
-}
-
-// GetBody returns the raw response body bytes
-func (r UndoEffectResponse) GetBody() []byte {
-	return r.Body
-}
-
-// Status returns HTTPResponse.Status
-func (r UndoEffectResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r UndoEffectResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r UndoEffectResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
@@ -2993,21 +2710,6 @@ func (c *ClientWithResponses) ApplyEffectChainWithResponse(ctx context.Context, 
 	return ParseApplyEffectChainResponse(rsp)
 }
 
-// GetEffectHistoryWithResponse Get the history of applied audio effects
-//
-// Retrieve the history of audio effects that have been applied to an audio file.
-//
-// Returns a wrapper object for the known response body format(s).
-//
-// Corresponds with GET /effects/{audioId}/history (the `GetEffectHistory` operationId).
-func (c *ClientWithResponses) GetEffectHistoryWithResponse(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetEffectHistoryResponse, error) {
-	rsp, err := c.GetEffectHistory(ctx, audioID, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetEffectHistoryResponse(rsp)
-}
-
 // ListEffectsWithResponse List available audio effects
 //
 // Retrieve a list of available audio effects that can be applied to an audio file.
@@ -3021,21 +2723,6 @@ func (c *ClientWithResponses) ListEffectsWithResponse(ctx context.Context, audio
 		return nil, err
 	}
 	return ParseListEffectsResponse(rsp)
-}
-
-// UndoEffectWithResponse Undo the last applied audio effect
-//
-// Undo the last applied audio effect on an audio file and return the modified audio file.
-//
-// Returns a wrapper object for the known response body format(s).
-//
-// Corresponds with POST /effects/{audioId}/undo (the `UndoEffect` operationId).
-func (c *ClientWithResponses) UndoEffectWithResponse(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*UndoEffectResponse, error) {
-	rsp, err := c.UndoEffect(ctx, audioID, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseUndoEffectResponse(rsp)
 }
 
 // GetHealthWithResponse Health check endpoint
@@ -3535,61 +3222,6 @@ func ParseApplyEffectChainResponse(rsp *http.Response) (*ApplyEffectChainRespons
 	return response, nil
 }
 
-// ParseGetEffectHistoryResponse parses an HTTP response from a GetEffectHistoryWithResponse call
-func ParseGetEffectHistoryResponse(rsp *http.Response) (*GetEffectHistoryResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetEffectHistoryResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			History []EffectHistoryItem `json:"history"`
-
-			// ID The unique identifier of the audio file.
-			ID openapi_types.UUID `json:"id"`
-
-			// RootAudioID The unique identifier of the original audio file before any effects were applied.
-			RootAudioID openapi_types.UUID `json:"rootAudioId"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest NotFound
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
-		var dest ServiceUnavailable
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON503 = &dest
-
-	}
-
-	return response, nil
-}
-
 // ParseListEffectsResponse parses an HTTP response from a ListEffectsWithResponse call
 func ParseListEffectsResponse(rsp *http.Response) (*ListEffectsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -3606,56 +3238,6 @@ func ParseListEffectsResponse(rsp *http.Response) (*ListEffectsResponse, error) 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest []EffectInfo
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest NotFound
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
-		var dest ServiceUnavailable
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON503 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseUndoEffectResponse parses an HTTP response from a UndoEffectWithResponse call
-func ParseUndoEffectResponse(rsp *http.Response) (*UndoEffectResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &UndoEffectResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			// ID The unique identifier of the audio file after undoing the last effect.
-			ID openapi_types.UUID `json:"id"`
-		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3735,15 +3317,9 @@ type ServerInterface interface {
 	// ApplyEffectChain Apply a chain of audio effects to an audio file
 	// (POST /effects/{audioId}/chain)
 	ApplyEffectChain(ctx *echo.Context, audioID openapi_types.UUID, params ApplyEffectChainParams) error
-	// GetEffectHistory Get the history of applied audio effects
-	// (GET /effects/{audioId}/history)
-	GetEffectHistory(ctx *echo.Context, audioID openapi_types.UUID) error
 	// ListEffects List available audio effects
 	// (GET /effects/{audioId}/list)
 	ListEffects(ctx *echo.Context, audioID openapi_types.UUID) error
-	// UndoEffect Undo the last applied audio effect
-	// (POST /effects/{audioId}/undo)
-	UndoEffect(ctx *echo.Context, audioID openapi_types.UUID) error
 	// GetHealth Health check endpoint
 	// (GET /health)
 	GetHealth(ctx *echo.Context) error
@@ -3966,22 +3542,6 @@ func (w *ServerInterfaceWrapper) ApplyEffectChain(ctx *echo.Context) error {
 	return err
 }
 
-// GetEffectHistory converts echo context to params.
-func (w *ServerInterfaceWrapper) GetEffectHistory(ctx *echo.Context) error {
-	var err error
-	// ------------- Path parameter "audioId" -------------
-	var audioID openapi_types.UUID
-
-	err = runtime.BindStyledParameterWithOptions("simple", "audioId", ctx.Param("audioId"), &audioID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: ctx.Request().URL.RawPath == ""})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter audioId: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetEffectHistory(ctx, audioID)
-	return err
-}
-
 // ListEffects converts echo context to params.
 func (w *ServerInterfaceWrapper) ListEffects(ctx *echo.Context) error {
 	var err error
@@ -3995,22 +3555,6 @@ func (w *ServerInterfaceWrapper) ListEffects(ctx *echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ListEffects(ctx, audioID)
-	return err
-}
-
-// UndoEffect converts echo context to params.
-func (w *ServerInterfaceWrapper) UndoEffect(ctx *echo.Context) error {
-	var err error
-	// ------------- Path parameter "audioId" -------------
-	var audioID openapi_types.UUID
-
-	err = runtime.BindStyledParameterWithOptions("simple", "audioId", ctx.Param("audioId"), &audioID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: ctx.Request().URL.RawPath == ""})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter audioId: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.UndoEffect(ctx, audioID)
 	return err
 }
 
@@ -4081,9 +3625,7 @@ func RegisterHandlersWithOptions(router EchoRouter, si ServerInterface, options 
 	router.GET(options.BaseURL+"/analysis/:audioId/spectrum", wrapper.GetSpectrum, options.OperationMiddlewares["GetSpectrum"]...)
 	router.POST(options.BaseURL+"/effects/:audioId/apply", wrapper.ApplyEffect, options.OperationMiddlewares["ApplyEffect"]...)
 	router.GET(options.BaseURL+"/effects/:audioId/list", wrapper.ListEffects, options.OperationMiddlewares["ListEffects"]...)
-	router.POST(options.BaseURL+"/effects/:audioId/undo", wrapper.UndoEffect, options.OperationMiddlewares["UndoEffect"]...)
 	router.POST(options.BaseURL+"/effects/:audioId/chain", wrapper.ApplyEffectChain, options.OperationMiddlewares["ApplyEffectChain"]...)
-	router.GET(options.BaseURL+"/effects/:audioId/history", wrapper.GetEffectHistory, options.OperationMiddlewares["GetEffectHistory"]...)
 
 }
 
@@ -4796,80 +4338,6 @@ func (response ApplyEffectChain503JSONResponse) VisitApplyEffectChainResponse(w 
 	return err
 }
 
-type GetEffectHistoryRequestObject struct {
-	AudioID openapi_types.UUID `json:"audioId"`
-}
-
-type GetEffectHistoryResponseObject interface {
-	VisitGetEffectHistoryResponse(w http.ResponseWriter) error
-}
-
-type GetEffectHistory200JSONResponse struct {
-	History []EffectHistoryItem `json:"history"`
-
-	// ID The unique identifier of the audio file.
-	ID openapi_types.UUID `json:"id"`
-
-	// RootAudioID The unique identifier of the original audio file before any effects were applied.
-	RootAudioID openapi_types.UUID `json:"rootAudioId"`
-}
-
-func (response GetEffectHistory200JSONResponse) VisitGetEffectHistoryResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetEffectHistory404JSONResponse struct{ NotFoundJSONResponse }
-
-func (response GetEffectHistory404JSONResponse) VisitGetEffectHistoryResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetEffectHistory500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response GetEffectHistory500JSONResponse) VisitGetEffectHistoryResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetEffectHistory503JSONResponse struct{ ServiceUnavailableJSONResponse }
-
-func (response GetEffectHistory503JSONResponse) VisitGetEffectHistoryResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(503)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
 type ListEffectsRequestObject struct {
 	AudioID openapi_types.UUID `json:"audioId"`
 }
@@ -4936,75 +4404,6 @@ func (response ListEffects503JSONResponse) VisitListEffectsResponse(w http.Respo
 	return err
 }
 
-type UndoEffectRequestObject struct {
-	AudioID openapi_types.UUID `json:"audioId"`
-}
-
-type UndoEffectResponseObject interface {
-	VisitUndoEffectResponse(w http.ResponseWriter) error
-}
-
-type UndoEffect200JSONResponse struct {
-	// ID The unique identifier of the audio file after undoing the last effect.
-	ID openapi_types.UUID `json:"id"`
-}
-
-func (response UndoEffect200JSONResponse) VisitUndoEffectResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type UndoEffect404JSONResponse struct{ NotFoundJSONResponse }
-
-func (response UndoEffect404JSONResponse) VisitUndoEffectResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type UndoEffect500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response UndoEffect500JSONResponse) VisitUndoEffectResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type UndoEffect503JSONResponse struct{ ServiceUnavailableJSONResponse }
-
-func (response UndoEffect503JSONResponse) VisitUndoEffectResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(503)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
 type GetHealthRequestObject struct {
 }
 
@@ -5060,15 +4459,9 @@ type StrictServerInterface interface {
 	// ApplyEffectChain Apply a chain of audio effects to an audio file
 	// (POST /effects/{audioId}/chain)
 	ApplyEffectChain(ctx context.Context, request ApplyEffectChainRequestObject) (ApplyEffectChainResponseObject, error)
-	// GetEffectHistory Get the history of applied audio effects
-	// (GET /effects/{audioId}/history)
-	GetEffectHistory(ctx context.Context, request GetEffectHistoryRequestObject) (GetEffectHistoryResponseObject, error)
 	// ListEffects List available audio effects
 	// (GET /effects/{audioId}/list)
 	ListEffects(ctx context.Context, request ListEffectsRequestObject) (ListEffectsResponseObject, error)
-	// UndoEffect Undo the last applied audio effect
-	// (POST /effects/{audioId}/undo)
-	UndoEffect(ctx context.Context, request UndoEffectRequestObject) (UndoEffectResponseObject, error)
 	// GetHealth Health check endpoint
 	// (GET /health)
 	GetHealth(ctx context.Context, request GetHealthRequestObject) (GetHealthResponseObject, error)
@@ -5375,31 +4768,6 @@ func (sh *strictHandler) ApplyEffectChain(ctx *echo.Context, audioID openapi_typ
 	return nil
 }
 
-// GetEffectHistory operation middleware
-func (sh *strictHandler) GetEffectHistory(ctx *echo.Context, audioID openapi_types.UUID) error {
-	var request GetEffectHistoryRequestObject
-
-	request.AudioID = audioID
-
-	handler := func(ctx *echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetEffectHistory(ctx.Request().Context(), request.(GetEffectHistoryRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GetEffectHistory")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(GetEffectHistoryResponseObject); ok {
-		return validResponse.VisitGetEffectHistoryResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
 // ListEffects operation middleware
 func (sh *strictHandler) ListEffects(ctx *echo.Context, audioID openapi_types.UUID) error {
 	var request ListEffectsRequestObject
@@ -5419,31 +4787,6 @@ func (sh *strictHandler) ListEffects(ctx *echo.Context, audioID openapi_types.UU
 		return err
 	} else if validResponse, ok := response.(ListEffectsResponseObject); ok {
 		return validResponse.VisitListEffectsResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// UndoEffect operation middleware
-func (sh *strictHandler) UndoEffect(ctx *echo.Context, audioID openapi_types.UUID) error {
-	var request UndoEffectRequestObject
-
-	request.AudioID = audioID
-
-	handler := func(ctx *echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.UndoEffect(ctx.Request().Context(), request.(UndoEffectRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "UndoEffect")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(UndoEffectResponseObject); ok {
-		return validResponse.VisitUndoEffectResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
 	}

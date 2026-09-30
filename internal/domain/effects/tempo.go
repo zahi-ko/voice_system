@@ -11,7 +11,7 @@ type ParameterTempo struct {
 }
 
 type EffectTempo struct {
-	Name  string         `json:"name"`
+	name  string         `json:"name"`
 	Param ParameterTempo `json:"parameters"`
 }
 
@@ -19,7 +19,7 @@ func NewTempo(p ParameterTempo) (EffectTempo, error) {
 	if p.Tempo < 0.5 || p.Tempo > 2.0 {
 		return EffectTempo{}, fmt.Errorf("effects: tempo %.2f out of range [0.5, 2.0]", p.Tempo)
 	}
-	return EffectTempo{Name: "tempo", Param: p}, nil
+	return EffectTempo{name: "tempo", Param: p}, nil
 }
 
 // 直接修改采样率即可达到变速变调的效果
@@ -34,4 +34,8 @@ func (e EffectTempo) Apply(data audio.AudioData, meta audio.Metadata) (audio.Aud
 	meta.Duration = meta.Duration / e.Param.Tempo
 
 	return out, meta, nil
+}
+
+func (e EffectTempo) Name() string {
+	return e.name
 }

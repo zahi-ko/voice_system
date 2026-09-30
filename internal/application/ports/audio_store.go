@@ -12,6 +12,7 @@ type AudioStore interface {
 
 	Save(context.Context, audio.Audio, audio.AudioData) error
 	Delete(context.Context, string) error
+	Replace(context.Context, string, audio.Audio, audio.AudioData) error
 
 	List(context.Context) (audio.AudioList, error)
 }

@@ -137,3 +137,16 @@ func (s *AudioStore) Delete(ctx context.Context, id string) error {
 
 	return nil
 }
+
+func (s *AudioStore) Replace(ctx context.Context, id string, item audio.Audio, audioData audio.AudioData) error {
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
+
+	s.Delete(ctx, id)
+	s.Save(ctx, item, audioData)
+
+	return nil
+}

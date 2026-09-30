@@ -12,7 +12,7 @@ type ParameterNormalization struct {
 }
 
 type EffectNormalization struct {
-	Name  string                 `json:"name"`
+	name  string                 `json:"name"`
 	Param ParameterNormalization `json:"parameters"`
 }
 
@@ -20,7 +20,7 @@ func NewNormalization(p ParameterNormalization) (EffectNormalization, error) {
 	if p.TargetLevel < -60 || p.TargetLevel > 0 {
 		return EffectNormalization{}, fmt.Errorf("effects: targetLevel %.1fdB out of range [-60, 0]", p.TargetLevel)
 	}
-	return EffectNormalization{Name: "normalize", Param: p}, nil
+	return EffectNormalization{name: "normalize", Param: p}, nil
 }
 
 func (e EffectNormalization) Apply(data audio.AudioData, meta audio.Metadata) (audio.AudioData, audio.Metadata, error) {
@@ -46,4 +46,8 @@ func (e EffectNormalization) Apply(data audio.AudioData, meta audio.Metadata) (a
 	}
 
 	return out, meta, nil
+}
+
+func (e EffectNormalization) Name() string {
+	return e.name
 }

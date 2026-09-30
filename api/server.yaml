@@ -10,64 +10,56 @@ servers:
 
 paths:
   /health:
-    $ref: './paths/health.yaml'
+    $ref: "./paths/health.yaml"
 
   /audio:
-    $ref: './paths/audio.yaml#/listAudio'
+    $ref: "./paths/audio.yaml#/listAudio"
   /audio/upload:
-    $ref: './paths/audio.yaml#/uploadAudio'
+    $ref: "./paths/audio.yaml#/uploadAudio"
   /audio/{audioId}:
-    $ref: './paths/audio.yaml#/removeAudio'
+    $ref: "./paths/audio.yaml#/removeAudio"
   /audio/{audioId}/download:
-    $ref: './paths/audio.yaml#/downloadAudio'
+    $ref: "./paths/audio.yaml#/downloadAudio"
 
   /analysis/{audioId}/stats:
-    $ref: './paths/analysis.yaml#/getStats'
+    $ref: "./paths/analysis.yaml#/getStats"
   /analysis/{audioId}/waveform:
-    $ref: './paths/analysis.yaml#/getWaveform'
+    $ref: "./paths/analysis.yaml#/getWaveform"
   /analysis/{audioId}/spectrogram:
-    $ref: './paths/analysis.yaml#/getSpectrogram'
+    $ref: "./paths/analysis.yaml#/getSpectrogram"
   /analysis/{audioId}/spectrum:
-    $ref: './paths/analysis.yaml#/getSpectrum'
+    $ref: "./paths/analysis.yaml#/getSpectrum"
 
   /effects/{audioId}/apply:
-    $ref: './paths/effects.yaml#/applyEffect'
+    $ref: "./paths/effects.yaml#/applyEffect"
   /effects/{audioId}/list:
-    $ref: './paths/effects.yaml#/listEffects'
-  /effects/{audioId}/undo:
-    $ref: './paths/effects.yaml#/undoEffect'
+    $ref: "./paths/effects.yaml#/listEffects"
   /effects/{audioId}/chain:
-    $ref: './paths/effects.yaml#/applyEffectChain'
-  /effects/{audioId}/history:
-    $ref: './paths/effects.yaml#/getEffectHistory'
-
-  #TODO: And endpoints for clone service.
+    $ref: "./paths/effects.yaml#/applyEffectChain"
 
 components:
   schemas:
     AudioMeta:
-      $ref: './components/schemas/audio/AudioMeta.yaml'
+      $ref: "./components/schemas/audio/AudioMeta.yaml"
     AudioList:
-      $ref: './components/schemas/audio/AudioList.yaml'
+      $ref: "./components/schemas/audio/AudioList.yaml"
     AudioStats:
-      $ref: './components/schemas/analysis/AudioStats.yaml'
+      $ref: "./components/schemas/analysis/AudioStats.yaml"
 
     WaveformResponse:
-      $ref: './components/schemas/analysis/WaveformResponse.yaml'
+      $ref: "./components/schemas/analysis/WaveformResponse.yaml"
     SpectrumResponse:
-      $ref: './components/schemas/analysis/SpectrumResponse.yaml'
+      $ref: "./components/schemas/analysis/SpectrumResponse.yaml"
     SpectrogramResponse:
-      $ref: './components/schemas/analysis/SpectrogramResponse.yaml'
+      $ref: "./components/schemas/analysis/SpectrogramResponse.yaml"
 
     EffectInfo:
-      $ref: './components/schemas/effects/EffectInfo.yaml#/EffectInfo'
+      $ref: "./components/schemas/effects/EffectInfo.yaml#/EffectInfo"
     EffectStep:
-      $ref: './components/schemas/effects/EffectStep.yaml'
-    EffectHistoryItem:
-      $ref: './components/schemas/effects/EffectHistoryItem.yaml'
+      $ref: "./components/schemas/effects/EffectStep.yaml"
 
     Error:
-      $ref: './components/schemas/common/Error.yaml'
+      $ref: "./components/schemas/common/Error.yaml"
 
   responses:
     NotFound:
@@ -75,22 +67,22 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     BadRequest:
       description: The request was invalid or cannot be served.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     InternalServerError:
       description: An unexpected error occurred on the server.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     ServiceUnavailable:
       description: The service is temporarily unavailable.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"

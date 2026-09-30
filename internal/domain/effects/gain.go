@@ -14,7 +14,7 @@ type ParameterGain struct {
 // EffectGain 增益效果。作为 Effect 的参考实现，
 // 其余效果按「参数结构体 + 构造校验 + Apply」同构展开。
 type EffectGain struct {
-	Name  string        `json:"name"`
+	name  string        `json:"name"`
 	Param ParameterGain `json:"parameters"`
 }
 
@@ -22,7 +22,7 @@ func NewGain(p ParameterGain) (EffectGain, error) {
 	if p.GainDB < -60 || p.GainDB > 12 {
 		return EffectGain{}, fmt.Errorf("effects: gain %.1fdB out of range [-60, 12]", p.GainDB)
 	}
-	return EffectGain{Name: "gain", Param: p}, nil
+	return EffectGain{name: "gain", Param: p}, nil
 }
 
 func (e EffectGain) Apply(data audio.AudioData, meta audio.Metadata) (audio.AudioData, audio.Metadata, error) {
@@ -32,4 +32,8 @@ func (e EffectGain) Apply(data audio.AudioData, meta audio.Metadata) (audio.Audi
 		out[i] = s * factor
 	}
 	return out, meta, nil
+}
+
+func (e EffectGain) Name() string {
+	return e.name
 }
