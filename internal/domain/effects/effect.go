@@ -6,3 +6,5 @@ type Effect interface {
 	Apply(data audio.AudioData, meta audio.Metadata) (audio.AudioData, audio.Metadata, error)
 	Name() string
 }
+
+type Payload map[string]interface{}

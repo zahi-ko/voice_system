@@ -2,6 +2,7 @@
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -9,6 +10,8 @@ import (
 	"voice_system/internal/application/ports"
 	"voice_system/internal/domain/audio"
 	"voice_system/internal/domain/effects"
+
+	"github.com/google/uuid"
 )
 
 type EffectService struct {
@@ -27,13 +30,11 @@ func NewEffectService(
 	}
 }
 
-func (s *EffectService) Apply(ctx context.Context, audioId string, save bool, effect effects.Effect) (audio.Audio, error) {
-	// TODO:
-	//  1. store.Get 拿到文件流（ReadSeeker），decoder.DecodeMeta 取 sampleRate + Decode 取样本
-	//  2. registry.Build(cmd.Step.Name, cmd.Step.Params) 构造 Effect
-	//  3. eff.Apply(samples, meta) 得到新样本和元数据
-	//  4. encoder.Encode -> saveAsNew ? 新 ID 存储 : 覆盖原文件（覆盖前保留旧版本供 undo）
-	//  5. 记录历史（EffectStep + 版本链）
+func (s *EffectService) Apply(ctx context.Context, audioId string, save bool, payload effects.Payload) (audio.Audio, error) {
+	effect, err := s.bindEffect(payload)
+	if err != nil {
+		return audio.Audio{}, fmt.Errorf("bind effect: %w", err)
+	}
 
 	aud, data, err := s.store.Get(ctx, audioId)
 	if err != nil {
@@ -59,6 +60,7 @@ func (s *EffectService) Apply(ctx context.Context, audioId string, save bool, ef
 		if err := s.store.Save(ctx, newAud, out); err != nil {
 			return audio.Audio{}, fmt.Errorf("save new audio: %w", err)
 		}
+		newAud.ID = uuid.NewString()
 	}
 
 	return newAud, nil
@@ -72,4 +74,30 @@ func (s *EffectService) ApplyChain(ctx context.Context, cmd commands.ApplyEffect
 
 func (s *EffectService) ListAvailable() []string {
 	return s.registry.Names()
+}
+
+func (s *EffectService) bindEffect(payload effects.Payload) (effects.Effect, error) {
+	effectMap := s.registry.GetMap()
+	if effectMap == nil {
+		return nil, errors.New("effect registry is nil")
+	}
+
+	name := payload["name"].(string)
+	eff, ok := effectMap[name]
+
+	if !ok {
+		return nil, fmt.Errorf("effect %s not found", name)
+	}
+
+	data, err := json.Marshal(payload)
+	if err != nil {
+		return nil, fmt.Errorf("marshal payload: %w", err)
+	}
+
+	if err := json.Unmarshal(data, &eff); err != nil {
+		return nil, fmt.Errorf("unmarshal payload to effect: %w", err)
+	}
+
+	return eff, nil
+
 }
