@@ -15,7 +15,7 @@ type EffectTempoPV struct {
 
 func NewTempoPV(p ParameterTempo) (EffectTempoPV, error) {
 	if p.Tempo < 0.5 || p.Tempo > 2.0 {
-		return EffectTempoPV{}, fmt.Errorf("effects: tempo %.2f out of range [0.5, 2.0]", p.Tempo)
+		return EffectTempoPV{}, invalidParameters("tempo %.2f out of range [0.5, 2.0]", p.Tempo)
 	}
 	return EffectTempoPV{Param: p}, nil
 }

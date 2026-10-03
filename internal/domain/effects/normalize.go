@@ -1,7 +1,6 @@
 package effects
 
 import (
-	"fmt"
 	"math"
 
 	"voice_system/internal/domain/audio"
@@ -17,7 +16,7 @@ type EffectNormalization struct {
 
 func NewNormalization(p ParameterNormalization) (EffectNormalization, error) {
 	if p.TargetLevel < -60 || p.TargetLevel > 0 {
-		return EffectNormalization{}, fmt.Errorf("effects: targetLevel %.1fdB out of range [-60, 0]", p.TargetLevel)
+		return EffectNormalization{}, invalidParameters("targetLevel %.1fdB out of range [-60, 0]", p.TargetLevel)
 	}
 	return EffectNormalization{Param: p}, nil
 }

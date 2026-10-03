@@ -118,6 +118,55 @@ func TestApplyEffectReverse(t *testing.T) {
 	}
 }
 
+// TestApplyEffectTempo 覆盖参数必须嵌套在 parameters 下的契约：
+// 平铺参数会被静默丢弃，导致 tempo 取到零值并被范围校验拒绝。
+func TestApplyEffectTempo(t *testing.T) {
+	cases := []struct {
+		name       string
+		body       string
+		wantRate   float64
+		wantSuffix string
+	}{
+		{"tempo", `{"name":"tempo","parameters":{"tempo":1.5}}`, 66150, "_tempo"},
+		{"tempo_pv", `{"name":"tempo_pv","parameters":{"tempo":1.5}}`, 44100, "_tempo_pv"},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			router, id := newEffectsRouter(t)
+
+			req := httptest.NewRequest(http.MethodPost, "/effects/"+id+"/apply", strings.NewReader(c.body))
+			req.Header.Set(echo.HeaderContentType, "application/json")
+			rec := httptest.NewRecorder()
+			router.ServeHTTP(rec, req)
+
+			if rec.Code != http.StatusOK {
+				t.Fatalf("apply status = %d, want %d: %s", rec.Code, http.StatusOK, rec.Body.String())
+			}
+
+			var applied struct {
+				ID         string  `json:"id"`
+				Name       string  `json:"name"`
+				Duration   float32 `json:"duration"`
+				SampleRate float64 `json:"sample_rate"`
+			}
+			if err := json.Unmarshal(rec.Body.Bytes(), &applied); err != nil {
+				t.Fatalf("decode apply response: %v", err)
+			}
+			if !strings.HasSuffix(applied.Name, c.wantSuffix) {
+				t.Errorf("apply response name = %q, want %s suffix", applied.Name, c.wantSuffix)
+			}
+			if applied.SampleRate != c.wantRate {
+				t.Errorf("sample_rate = %v, want %v", applied.SampleRate, c.wantRate)
+			}
+			// 1.5 倍速后时长应缩短为原来的 2/3
+			if applied.Duration > 12.78 || applied.Duration < 8.0 {
+				t.Errorf("duration = %f, want ~8.52 (原 12.78 / 1.5)", applied.Duration)
+			}
+		})
+	}
+}
+
 func TestApplyEffectInvalidPayload(t *testing.T) {
 	router, id := newEffectsRouter(t)
 
@@ -129,6 +178,8 @@ func TestApplyEffectInvalidPayload(t *testing.T) {
 		{"unknown effect", `{"name":"pitch"}`},
 		{"gain out of range", `{"name":"gain","parameters":{"db":999}}`},
 		{"tempo out of range", `{"name":"tempo","parameters":{"tempo":4.0}}`},
+		// 参数平铺在顶层等价于缺失 parameters，tempo 会取到零值并被拒绝
+		{"tempo flat params", `{"name":"tempo","tempo":1.5}`},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -137,8 +188,12 @@ func TestApplyEffectInvalidPayload(t *testing.T) {
 			rec := httptest.NewRecorder()
 			router.ServeHTTP(rec, req)
 
-			if rec.Code != http.StatusInternalServerError {
-				t.Fatalf("apply status = %d, want %d: %s", rec.Code, http.StatusInternalServerError, rec.Body.String())
+			// 效果名/参数问题属于调用方错误，应回 400 并带出具体原因
+			if rec.Code != http.StatusBadRequest {
+				t.Fatalf("apply status = %d, want %d: %s", rec.Code, http.StatusBadRequest, rec.Body.String())
+			}
+			if !strings.Contains(rec.Body.String(), "effects:") {
+				t.Errorf("error body = %s, want it to carry the underlying reason", rec.Body.String())
 			}
 		})
 	}

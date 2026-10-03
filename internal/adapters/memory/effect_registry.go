@@ -29,19 +29,19 @@ func NewRegistry() (*Registry, error) {
 func (r *Registry) Bind(payload effects.Payload) (effects.Effect, error) {
 	rawName, ok := payload["name"]
 	if !ok {
-		return nil, fmt.Errorf("effect name not provided in payload")
+		return nil, fmt.Errorf("%w: name not provided in payload", effects.ErrUnknownEffect)
 	}
 
 	name, ok := rawName.(string)
 	if !ok {
-		return nil, fmt.Errorf("effect name must be a string")
+		return nil, fmt.Errorf("%w: name must be a string", effects.ErrUnknownEffect)
 	}
 
 	r.mu.RLock()
 	factory, ok := r.effectStore[name]
 	r.mu.RUnlock()
 	if !ok {
-		return nil, fmt.Errorf("effect %s not found", name)
+		return nil, fmt.Errorf("%w: %s", effects.ErrUnknownEffect, name)
 	}
 
 	return factory(payload)

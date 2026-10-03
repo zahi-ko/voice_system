@@ -1,8 +1,6 @@
 package effects
 
 import (
-	"fmt"
-
 	"voice_system/internal/domain/audio"
 )
 
@@ -16,7 +14,7 @@ type EffectTempo struct {
 
 func NewTempo(p ParameterTempo) (EffectTempo, error) {
 	if p.Tempo < 0.5 || p.Tempo > 2.0 {
-		return EffectTempo{}, fmt.Errorf("effects: tempo %.2f out of range [0.5, 2.0]", p.Tempo)
+		return EffectTempo{}, invalidParameters("tempo %.2f out of range [0.5, 2.0]", p.Tempo)
 	}
 	return EffectTempo{Param: p}, nil
 }

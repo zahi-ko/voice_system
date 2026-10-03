@@ -1,7 +1,6 @@
 package effects
 
 import (
-	"fmt"
 	"math"
 
 	"voice_system/internal/domain/audio"
@@ -19,7 +18,7 @@ type EffectGain struct {
 
 func NewGain(p ParameterGain) (EffectGain, error) {
 	if p.GainDB < -60 || p.GainDB > 12 {
-		return EffectGain{}, fmt.Errorf("effects: gain %.1fdB out of range [-60, 12]", p.GainDB)
+		return EffectGain{}, invalidParameters("gain %.1fdB out of range [-60, 12]", p.GainDB)
 	}
 	return EffectGain{Param: p}, nil
 }
