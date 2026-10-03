@@ -4,14 +4,6 @@ listEffects:
     description: Retrieve a list of available audio effects that can be applied to an audio file.
     tags: [Effects]
     operationId: ListEffects
-    parameters:
-      - name: audioId
-        in: path
-        required: true
-        description: The unique identifier of the audio file to analyze.
-        schema:
-          type: string
-          format: uuid
     responses:
       "200":
         description: List of available audio effects retrieved successfully.
@@ -20,7 +12,7 @@ listEffects:
             schema:
               type: array
               items:
-                $ref: "../server.yaml#/components/schemas/EffectInfo"
+                type: string
       "404":
         $ref: "../server.yaml#/components/responses/NotFound"
       "500":
@@ -110,10 +102,8 @@ applyEffectChain:
                   description: The unique identifier of the audio file after applying the effect chain.
                   format: uuid
                 applied_effects:
-                  type: array
-                  description: A list of the effects that were applied in the order they were applied.
-                  items:
-                    $ref: "../server.yaml#/components/schemas/EffectStep"
+                  type: string
+                  description: A description of the effects that were applied to the audio file.
                 metadata:
                   $ref: "../server.yaml#/components/schemas/AudioMeta"
       "400":
@@ -122,4 +112,3 @@ applyEffectChain:
         $ref: "../server.yaml#/components/responses/InternalServerError"
       "503":
         $ref: "../server.yaml#/components/responses/ServiceUnavailable"
-

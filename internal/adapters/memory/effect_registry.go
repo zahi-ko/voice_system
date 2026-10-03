@@ -5,17 +5,17 @@ import (
 	"voice_system/internal/domain/effects"
 )
 
-var effect_store = map[string]effects.Effect{
-	"gain":      effects.EffectGain{},
-	"tempo":     effects.EffectTempo{},
-	"reverse":   effects.EffectReverse{},
-	"tempo_pv":  effects.EffectTempoPV{},
-	"normalize": effects.EffectNormalization{},
+var effect_store = map[string]func() effects.Effect{
+    "gain":      func() effects.Effect { return &effects.EffectGain{} },
+    "tempo":     func() effects.Effect { return &effects.EffectTempo{} },
+    "reverse":   func() effects.Effect { return &effects.EffectReverse{} },
+    "tempo_pv":  func() effects.Effect { return &effects.EffectTempoPV{} },
+    "normalize": func() effects.Effect { return &effects.EffectNormalization{} },
 }
 
 type Registry struct {
 	mu          sync.RWMutex
-	effectStore map[string]effects.Effect
+	effectStore map[string]func() effects.Effect
 }
 
 func NewRegistry() (*Registry, error) {
@@ -27,14 +27,14 @@ func NewRegistry() (*Registry, error) {
 func (r *Registry) Register(name string, effect effects.Effect) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.effectStore[name] = effect
+	r.effectStore[name] = func() effects.Effect { return effect }
 }
 
 func (r *Registry) Get(name string) (effects.Effect, bool) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	effect, ok := r.effectStore[name]
-	return effect, ok
+	return effect(), ok
 }
 
 func (r *Registry) Names() []string {
@@ -49,6 +49,6 @@ func (r *Registry) Names() []string {
 	return names
 }
 
-func (r *Registry) GetMap() map[string]effects.Effect {
-	return effect_store
+func (r *Registry) GetMap() map[string]func() effects.Effect {
+	return r.effectStore
 }

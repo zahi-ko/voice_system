@@ -32,7 +32,7 @@ paths:
 
   /effects/{audioId}/apply:
     $ref: "./paths/effects.yaml#/applyEffect"
-  /effects/{audioId}/list:
+  /effects/list:
     $ref: "./paths/effects.yaml#/listEffects"
   /effects/{audioId}/chain:
     $ref: "./paths/effects.yaml#/applyEffectChain"

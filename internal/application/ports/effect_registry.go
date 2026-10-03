@@ -6,5 +6,5 @@ type EffectRegistry interface {
 	Register(name string, effect effects.Effect)
 	Get(name string) (effects.Effect, bool)
 	Names() []string
-	GetMap() map[string]effects.Effect
+	GetMap() map[string]func() effects.Effect
 }

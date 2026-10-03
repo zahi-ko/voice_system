@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"voice_system/internal/domain/effects"
 	"voice_system/internal/transport/http/generated"
@@ -35,19 +36,37 @@ func (h *Handler) ApplyEffect(ctx *echo.Context, audioID openapi_types.UUID, par
 }
 
 func (h *Handler) ApplyEffectChain(ctx *echo.Context, audioID openapi_types.UUID, params generated.ApplyEffectChainParams) error {
-	return notImplemented()
+	if h.effectService == nil {
+		return echo.NewHTTPError(http.StatusServiceUnavailable, "effect service unavailable")
+	}
+
+	var payload []effects.Payload
+	if err := json.NewDecoder(ctx.Request().Body).Decode(&payload); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid request payload")
+	}
+
+	if len(payload) == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "effect chain cannot be empty")
+	}
+
+	id := transporthttp.APItoUUID(audioID)
+	save := transporthttp.APItoSaveAsNewChain(params)
+
+	aud, applied, err := h.effectService.ApplyChain(ctx.Request().Context(), id, save, payload)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to apply effect chain")
+	}
+
+	response := transporthttp.EffectChainResponseToAPI(aud, applied)
+
+	return ctx.JSON(http.StatusOK, response)
 }
 
-func (h *Handler) GetEffectHistory(ctx *echo.Context, audioID openapi_types.UUID) error {
-	return notImplemented()
-}
+func (h *Handler) ListEffects(ctx *echo.Context) error {
+	if h.effectService == nil {
+		return echo.NewHTTPError(http.StatusServiceUnavailable, "effect service unavailable")
+	}
 
-func (h *Handler) ListEffects(ctx *echo.Context, audioID openapi_types.UUID) error {
-	return notImplemented()
+	effectsList := h.effectService.ListAvailable()
+	return ctx.JSON(http.StatusOK, effectsList)
 }
-
-func (h *Handler) UndoEffect(ctx *echo.Context, audioID openapi_types.UUID) error {
-	return notImplemented()
-}
-
-// func bindEffect(ctx *echo.Context, )

@@ -1,11 +1,18 @@
 package http
 
 import (
+	"uuid"
 	"voice_system/internal/domain/audio"
 	"voice_system/internal/transport/http/generated"
 
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
+
+type EffectChainResponse struct {
+	ID             string              `json:"id"`
+	Metadata       generated.AudioMeta `json:"metadata"`
+	AppliedEffects string              `json:"applied_effects"`
+}
 
 func FormatToMIME(format audio.Format) string {
 	switch format {
@@ -55,10 +62,34 @@ func APItoUUID(audioId openapi_types.UUID) string {
 	return audioId.String()
 }
 
+func UUIDToAPI(id string) openapi_types.UUID {
+	converted, err := uuid.Parse(id)
+	if err != nil {
+		return openapi_types.UUID{}
+	}
+	return openapi_types.UUID(converted)
+}
+
 func APItoSaveAsNew(saveAsNew generated.ApplyEffectParams) bool {
 	save := saveAsNew.SaveAsNew
 	if save == nil {
 		return false
 	}
 	return *save
+}
+
+func APItoSaveAsNewChain(saveAsNew generated.ApplyEffectChainParams) bool {
+	save := saveAsNew.SaveAsNew
+	if save == nil {
+		return false
+	}
+	return *save
+}
+
+func EffectChainResponseToAPI(aud audio.Audio, applied string) EffectChainResponse {
+	return EffectChainResponse{
+		ID:             aud.ID,
+		AppliedEffects: applied,
+		Metadata:       AudioToAPI(aud),
+	}
 }
