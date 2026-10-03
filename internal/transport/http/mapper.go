@@ -93,3 +93,10 @@ func EffectChainResponseToAPI(aud audio.Audio, applied string) EffectChainRespon
 		Metadata:       AudioToAPI(aud),
 	}
 }
+
+func APItoPoint(point generated.GetWaveformParams) int {
+	if point.Points == nil {
+		return 2000
+	}
+	return *point.Points
+}

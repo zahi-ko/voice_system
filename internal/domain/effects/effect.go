@@ -1,4 +1,4 @@
-﻿package effects
+package effects
 
 import "voice_system/internal/domain/audio"
 

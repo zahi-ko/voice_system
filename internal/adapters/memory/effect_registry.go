@@ -6,11 +6,11 @@ import (
 )
 
 var effect_store = map[string]func() effects.Effect{
-    "gain":      func() effects.Effect { return &effects.EffectGain{} },
-    "tempo":     func() effects.Effect { return &effects.EffectTempo{} },
-    "reverse":   func() effects.Effect { return &effects.EffectReverse{} },
-    "tempo_pv":  func() effects.Effect { return &effects.EffectTempoPV{} },
-    "normalize": func() effects.Effect { return &effects.EffectNormalization{} },
+	"gain":      func() effects.Effect { return &effects.EffectGain{} },
+	"tempo":     func() effects.Effect { return &effects.EffectTempo{} },
+	"reverse":   func() effects.Effect { return &effects.EffectReverse{} },
+	"tempo_pv":  func() effects.Effect { return &effects.EffectTempoPV{} },
+	"normalize": func() effects.Effect { return &effects.EffectNormalization{} },
 }
 
 type Registry struct {

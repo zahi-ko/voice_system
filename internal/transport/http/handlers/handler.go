@@ -11,8 +11,9 @@ import (
 
 // Handler contains the HTTP handlers for the API.
 type Handler struct {
-	audioService  *application.AudioService
-	effectService *application.EffectService
+	audioService    *application.AudioService
+	effectService   *application.EffectService
+	analysisService *application.AnalysisService
 }
 
 var _ generated.ServerInterface = (*Handler)(nil)
