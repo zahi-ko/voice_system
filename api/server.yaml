@@ -25,8 +25,8 @@ paths:
     $ref: "./paths/analysis.yaml#/getStats"
   /analysis/{audioId}/waveform:
     $ref: "./paths/analysis.yaml#/getWaveform"
-  /analysis/{audioId}/spectrogram:
-    $ref: "./paths/analysis.yaml#/getSpectrogram"
+  # /analysis/{audioId}/spectrogram:
+  #   $ref: "./paths/analysis.yaml#/getSpectrogram"
   /analysis/{audioId}/spectrum:
     $ref: "./paths/analysis.yaml#/getSpectrum"
 

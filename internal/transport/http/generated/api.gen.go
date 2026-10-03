@@ -110,66 +110,33 @@ func (e TempoEffectName) Valid() bool {
 	}
 }
 
-// Defines values for GetSpectrogramParamsNfft.
-const (
-	GetSpectrogramParamsNfftN1024 GetSpectrogramParamsNfft = 1024
-	GetSpectrogramParamsNfftN128  GetSpectrogramParamsNfft = 128
-	GetSpectrogramParamsNfftN2048 GetSpectrogramParamsNfft = 2048
-	GetSpectrogramParamsNfftN256  GetSpectrogramParamsNfft = 256
-	GetSpectrogramParamsNfftN4096 GetSpectrogramParamsNfft = 4096
-	GetSpectrogramParamsNfftN512  GetSpectrogramParamsNfft = 512
-	GetSpectrogramParamsNfftN8192 GetSpectrogramParamsNfft = 8192
-)
-
-// Valid indicates whether the value is a known member of the GetSpectrogramParamsNfft enum.
-func (e GetSpectrogramParamsNfft) Valid() bool {
-	switch e {
-	case GetSpectrogramParamsNfftN1024:
-		return true
-	case GetSpectrogramParamsNfftN128:
-		return true
-	case GetSpectrogramParamsNfftN2048:
-		return true
-	case GetSpectrogramParamsNfftN256:
-		return true
-	case GetSpectrogramParamsNfftN4096:
-		return true
-	case GetSpectrogramParamsNfftN512:
-		return true
-	case GetSpectrogramParamsNfftN8192:
-		return true
-	default:
-		return false
-	}
-}
-
 // Defines values for GetSpectrumParamsNfft.
 const (
-	GetSpectrumParamsNfftN1024 GetSpectrumParamsNfft = 1024
-	GetSpectrumParamsNfftN128  GetSpectrumParamsNfft = 128
-	GetSpectrumParamsNfftN2048 GetSpectrumParamsNfft = 2048
-	GetSpectrumParamsNfftN256  GetSpectrumParamsNfft = 256
-	GetSpectrumParamsNfftN4096 GetSpectrumParamsNfft = 4096
-	GetSpectrumParamsNfftN512  GetSpectrumParamsNfft = 512
-	GetSpectrumParamsNfftN8192 GetSpectrumParamsNfft = 8192
+	N1024 GetSpectrumParamsNfft = 1024
+	N128  GetSpectrumParamsNfft = 128
+	N2048 GetSpectrumParamsNfft = 2048
+	N256  GetSpectrumParamsNfft = 256
+	N4096 GetSpectrumParamsNfft = 4096
+	N512  GetSpectrumParamsNfft = 512
+	N8192 GetSpectrumParamsNfft = 8192
 )
 
 // Valid indicates whether the value is a known member of the GetSpectrumParamsNfft enum.
 func (e GetSpectrumParamsNfft) Valid() bool {
 	switch e {
-	case GetSpectrumParamsNfftN1024:
+	case N1024:
 		return true
-	case GetSpectrumParamsNfftN128:
+	case N128:
 		return true
-	case GetSpectrumParamsNfftN2048:
+	case N2048:
 		return true
-	case GetSpectrumParamsNfftN256:
+	case N256:
 		return true
-	case GetSpectrumParamsNfftN4096:
+	case N4096:
 		return true
-	case GetSpectrumParamsNfftN512:
+	case N512:
 		return true
-	case GetSpectrumParamsNfftN8192:
+	case N8192:
 		return true
 	default:
 		return false
@@ -303,27 +270,6 @@ type ReverseEffect struct {
 // ReverseEffectName The unique name of the effect.
 type ReverseEffectName string
 
-// SpectrogramResponse The response for a spectrogram analysis request.
-type SpectrogramResponse struct {
-	// CeilingDB The ceiling decibel level used for the spectrogram visualization.
-	CeilingDB float32 `json:"ceiling_db"`
-
-	// Data The spectrogram data of the audio file
-	Data *[][]int `json:"data,omitempty"`
-
-	// FloorDB The floor decibel level used for the spectrogram visualization.
-	FloorDB float32 `json:"floor_db"`
-
-	// Frequencies The frequency bins corresponding to the spectrogram data.
-	Frequencies *[]float32 `json:"frequencies,omitempty"`
-
-	// ID The unique identifier of the audio file.
-	ID string `json:"id"`
-
-	// Times The time bins corresponding to the spectrogram data.
-	Times *[]float32 `json:"times,omitempty"`
-}
-
 // SpectrumResponse The response for a spectrum analysis request.
 type SpectrumResponse struct {
 	// Frequencies The frequency bins corresponding to the spectrum data.
@@ -401,24 +347,6 @@ type NotFound = Error
 
 // ServiceUnavailable A standardized error response format for the API.
 type ServiceUnavailable = Error
-
-// GetSpectrogramParams defines parameters for GetSpectrogram.
-type GetSpectrogramParams struct {
-	// Nfft The number of points in the FFT (Fast Fourier Transform) for spectrogram analysis.
-	Nfft *GetSpectrogramParamsNfft `form:"nfft,omitempty" json:"nfft,omitempty"`
-
-	// MaxFrames The maximum number of frames to include in the spectrogram.
-	MaxFrames *int `form:"max_frames,omitempty" json:"max_frames,omitempty"`
-
-	// FloorDB The floor decibel level for the spectrogram.
-	FloorDB *float32 `form:"floor_db,omitempty" json:"floor_db,omitempty"`
-
-	// CeilingDB The ceiling decibel level for the spectrogram.
-	CeilingDB *float32 `form:"ceiling_db,omitempty" json:"ceiling_db,omitempty"`
-}
-
-// GetSpectrogramParamsNfft defines parameters for GetSpectrogram.
-type GetSpectrogramParamsNfft int
 
 // GetSpectrumParams defines parameters for GetSpectrum.
 type GetSpectrumParams struct {
@@ -682,13 +610,6 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 // The interface specification for the client above.
 type ClientInterface interface {
 
-	// GetSpectrogram Get audio spectrogram
-	//
-	// Retrieve the spectrogram data of an audio file.
-	//
-	// Corresponds with GET /analysis/{audioId}/spectrogram (the `GetSpectrogram` operationId).
-	GetSpectrogram(ctx context.Context, audioID string, params *GetSpectrogramParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// GetSpectrum Get audio spectrum
 	//
 	// Retrieve the spectrum data of an audio file.
@@ -789,23 +710,6 @@ type ClientInterface interface {
 	//
 	// Corresponds with GET /health (the `GetHealth` operationId).
 	GetHealth(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
-}
-
-// GetSpectrogram Get audio spectrogram
-//
-// Retrieve the spectrogram data of an audio file.
-//
-// Corresponds with GET /analysis/{audioId}/spectrogram (the `GetSpectrogram` operationId).
-func (c *Client) GetSpectrogram(ctx context.Context, audioID string, params *GetSpectrogramParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetSpectrogramRequest(c.Server, audioID, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
 }
 
 // GetSpectrum Get audio spectrum
@@ -1037,103 +941,6 @@ func (c *Client) GetHealth(ctx context.Context, reqEditors ...RequestEditorFn) (
 		return nil, err
 	}
 	return c.Client.Do(req)
-}
-
-// NewGetSpectrogramRequest constructs an http.Request for the GetSpectrogram method
-func NewGetSpectrogramRequest(server string, audioID string, params *GetSpectrogramParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "audioId", audioID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/analysis/%s/spectrogram", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		// queryValues collects non-styled parameters (passthrough, JSON)
-		// that are safe to round-trip through url.Values.Encode().
-		queryValues := queryURL.Query()
-		// rawQueryFragments collects pre-encoded query fragments from
-		// styled parameters, preserving literal commas as delimiters
-		// per the OpenAPI spec (e.g. "color=blue,black,brown").
-		var rawQueryFragments []string
-
-		if params.Nfft != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "nfft", *params.Nfft, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else {
-				for _, qp := range strings.Split(queryFrag, "&") {
-					rawQueryFragments = append(rawQueryFragments, qp)
-				}
-			}
-
-		}
-
-		if params.MaxFrames != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "max_frames", *params.MaxFrames, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else {
-				for _, qp := range strings.Split(queryFrag, "&") {
-					rawQueryFragments = append(rawQueryFragments, qp)
-				}
-			}
-
-		}
-
-		if params.FloorDB != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "floor_db", *params.FloorDB, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "number", Format: ""}); err != nil {
-				return nil, err
-			} else {
-				for _, qp := range strings.Split(queryFrag, "&") {
-					rawQueryFragments = append(rawQueryFragments, qp)
-				}
-			}
-
-		}
-
-		if params.CeilingDB != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "ceiling_db", *params.CeilingDB, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "number", Format: ""}); err != nil {
-				return nil, err
-			} else {
-				for _, qp := range strings.Split(queryFrag, "&") {
-					rawQueryFragments = append(rawQueryFragments, qp)
-				}
-			}
-
-		}
-
-		if encoded := queryValues.Encode(); encoded != "" {
-			rawQueryFragments = append(rawQueryFragments, encoded)
-		}
-		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
-	}
-
-	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
 }
 
 // NewGetSpectrumRequest constructs an http.Request for the GetSpectrum method
@@ -1662,15 +1469,6 @@ func WithBaseURL(baseURL string) ClientOption {
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
 
-	// GetSpectrogramWithResponse Get audio spectrogram
-	//
-	// Retrieve the spectrogram data of an audio file.
-	//
-	// Returns a wrapper object for the known response body format(s).
-	//
-	// Corresponds with GET /analysis/{audioId}/spectrogram (the `GetSpectrogram` operationId).
-	GetSpectrogramWithResponse(ctx context.Context, audioID string, params *GetSpectrogramParams, reqEditors ...RequestEditorFn) (*GetSpectrogramResponse, error)
-
 	// GetSpectrumWithResponse Get audio spectrum
 	//
 	// Retrieve the spectrum data of an audio file.
@@ -1787,75 +1585,6 @@ type ClientWithResponsesInterface interface {
 	//
 	// Corresponds with GET /health (the `GetHealth` operationId).
 	GetHealthWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetHealthResponse, error)
-}
-
-type GetSpectrogramResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	// JSON200 the response for an HTTP 200 `application/json` response
-	JSON200 *SpectrogramResponse
-	// JSON400 the response for an HTTP 400 `application/json` response
-	JSON400 *BadRequest
-	// JSON404 the response for an HTTP 404 `application/json` response
-	JSON404 *NotFound
-	// JSON500 the response for an HTTP 500 `application/json` response
-	JSON500 *InternalServerError
-	// JSON503 the response for an HTTP 503 `application/json` response
-	JSON503 *ServiceUnavailable
-}
-
-// GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r GetSpectrogramResponse) GetJSON200() *SpectrogramResponse {
-	return r.JSON200
-}
-
-// GetJSON400 returns the response for an HTTP 400 `application/json` response
-func (r GetSpectrogramResponse) GetJSON400() *BadRequest {
-	return r.JSON400
-}
-
-// GetJSON404 returns the response for an HTTP 404 `application/json` response
-func (r GetSpectrogramResponse) GetJSON404() *NotFound {
-	return r.JSON404
-}
-
-// GetJSON500 returns the response for an HTTP 500 `application/json` response
-func (r GetSpectrogramResponse) GetJSON500() *InternalServerError {
-	return r.JSON500
-}
-
-// GetJSON503 returns the response for an HTTP 503 `application/json` response
-func (r GetSpectrogramResponse) GetJSON503() *ServiceUnavailable {
-	return r.JSON503
-}
-
-// GetBody returns the raw response body bytes
-func (r GetSpectrogramResponse) GetBody() []byte {
-	return r.Body
-}
-
-// Status returns HTTPResponse.Status
-func (r GetSpectrogramResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetSpectrogramResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r GetSpectrogramResponse) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
 }
 
 type GetSpectrumResponse struct {
@@ -2523,21 +2252,6 @@ func (r GetHealthResponse) ContentType() string {
 	return ""
 }
 
-// GetSpectrogramWithResponse Get audio spectrogram
-//
-// Retrieve the spectrogram data of an audio file.
-//
-// Returns a wrapper object for the known response body format(s).
-//
-// Corresponds with GET /analysis/{audioId}/spectrogram (the `GetSpectrogram` operationId).
-func (c *ClientWithResponses) GetSpectrogramWithResponse(ctx context.Context, audioID string, params *GetSpectrogramParams, reqEditors ...RequestEditorFn) (*GetSpectrogramResponse, error) {
-	rsp, err := c.GetSpectrogram(ctx, audioID, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetSpectrogramResponse(rsp)
-}
-
 // GetSpectrumWithResponse Get audio spectrum
 //
 // Retrieve the spectrum data of an audio file.
@@ -2731,60 +2445,6 @@ func (c *ClientWithResponses) GetHealthWithResponse(ctx context.Context, reqEdit
 		return nil, err
 	}
 	return ParseGetHealthResponse(rsp)
-}
-
-// ParseGetSpectrogramResponse parses an HTTP response from a GetSpectrogramWithResponse call
-func ParseGetSpectrogramResponse(rsp *http.Response) (*GetSpectrogramResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetSpectrogramResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest SpectrogramResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest BadRequest
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest NotFound
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
-		var dest ServiceUnavailable
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON503 = &dest
-
-	}
-
-	return response, nil
 }
 
 // ParseGetSpectrumResponse parses an HTTP response from a GetSpectrumWithResponse call
@@ -3280,9 +2940,6 @@ func ParseGetHealthResponse(rsp *http.Response) (*GetHealthResponse, error) {
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// GetSpectrogram Get audio spectrogram
-	// (GET /analysis/{audioId}/spectrogram)
-	GetSpectrogram(ctx *echo.Context, audioID string, params GetSpectrogramParams) error
 	// GetSpectrum Get audio spectrum
 	// (GET /analysis/{audioId}/spectrum)
 	GetSpectrum(ctx *echo.Context, audioID string, params GetSpectrumParams) error
@@ -3321,52 +2978,6 @@ type ServerInterface interface {
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler ServerInterface
-}
-
-// GetSpectrogram converts echo context to params.
-func (w *ServerInterfaceWrapper) GetSpectrogram(ctx *echo.Context) error {
-	var err error
-	// ------------- Path parameter "audioId" -------------
-	var audioID string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "audioId", ctx.Param("audioId"), &audioID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: ctx.Request().URL.RawPath == ""})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter audioId: %s", err))
-	}
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params GetSpectrogramParams
-	// ------------- Optional query parameter "nfft" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "nfft", ctx.QueryParams(), &params.Nfft, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter nfft: %s", err))
-	}
-
-	// ------------- Optional query parameter "max_frames" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "max_frames", ctx.QueryParams(), &params.MaxFrames, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter max_frames: %s", err))
-	}
-
-	// ------------- Optional query parameter "floor_db" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "floor_db", ctx.QueryParams(), &params.FloorDB, runtime.BindQueryParameterOptions{Type: "number", Format: ""})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter floor_db: %s", err))
-	}
-
-	// ------------- Optional query parameter "ceiling_db" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "ceiling_db", ctx.QueryParams(), &params.CeilingDB, runtime.BindQueryParameterOptions{Type: "number", Format: ""})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter ceiling_db: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetSpectrogram(ctx, audioID, params)
-	return err
 }
 
 // GetSpectrum converts echo context to params.
@@ -3607,7 +3218,6 @@ func RegisterHandlersWithOptions(router EchoRouter, si ServerInterface, options 
 	router.GET(options.BaseURL+"/audio/:audioId/download", wrapper.DownloadAudio, options.OperationMiddlewares["DownloadAudio"]...)
 	router.GET(options.BaseURL+"/analysis/:audioId/stats", wrapper.GetStats, options.OperationMiddlewares["GetStats"]...)
 	router.GET(options.BaseURL+"/analysis/:audioId/waveform", wrapper.GetWaveform, options.OperationMiddlewares["GetWaveform"]...)
-	router.GET(options.BaseURL+"/analysis/:audioId/spectrogram", wrapper.GetSpectrogram, options.OperationMiddlewares["GetSpectrogram"]...)
 	router.GET(options.BaseURL+"/analysis/:audioId/spectrum", wrapper.GetSpectrum, options.OperationMiddlewares["GetSpectrum"]...)
 	router.POST(options.BaseURL+"/effects/:audioId/apply", wrapper.ApplyEffect, options.OperationMiddlewares["ApplyEffect"]...)
 	router.GET(options.BaseURL+"/effects/list", wrapper.ListEffects, options.OperationMiddlewares["ListEffects"]...)
@@ -3622,87 +3232,6 @@ type InternalServerErrorJSONResponse Error
 type NotFoundJSONResponse Error
 
 type ServiceUnavailableJSONResponse Error
-
-type GetSpectrogramRequestObject struct {
-	AudioID string `json:"audioId"`
-	Params  GetSpectrogramParams
-}
-
-type GetSpectrogramResponseObject interface {
-	VisitGetSpectrogramResponse(w http.ResponseWriter) error
-}
-
-type GetSpectrogram200JSONResponse SpectrogramResponse
-
-func (response GetSpectrogram200JSONResponse) VisitGetSpectrogramResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetSpectrogram400JSONResponse struct{ BadRequestJSONResponse }
-
-func (response GetSpectrogram400JSONResponse) VisitGetSpectrogramResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetSpectrogram404JSONResponse struct{ NotFoundJSONResponse }
-
-func (response GetSpectrogram404JSONResponse) VisitGetSpectrogramResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetSpectrogram500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response GetSpectrogram500JSONResponse) VisitGetSpectrogramResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetSpectrogram503JSONResponse struct{ ServiceUnavailableJSONResponse }
-
-func (response GetSpectrogram503JSONResponse) VisitGetSpectrogramResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(503)
-	_, err := buf.WriteTo(w)
-	return err
-}
 
 type GetSpectrumRequestObject struct {
 	AudioID string `json:"audioId"`
@@ -4414,9 +3943,6 @@ func (response GetHealth503Response) VisitGetHealthResponse(w http.ResponseWrite
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
-	// GetSpectrogram Get audio spectrogram
-	// (GET /analysis/{audioId}/spectrogram)
-	GetSpectrogram(ctx context.Context, request GetSpectrogramRequestObject) (GetSpectrogramResponseObject, error)
 	// GetSpectrum Get audio spectrum
 	// (GET /analysis/{audioId}/spectrum)
 	GetSpectrum(ctx context.Context, request GetSpectrumRequestObject) (GetSpectrumResponseObject, error)
@@ -4462,32 +3988,6 @@ func NewStrictHandler(ssi StrictServerInterface, middlewares []StrictMiddlewareF
 type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
-}
-
-// GetSpectrogram operation middleware
-func (sh *strictHandler) GetSpectrogram(ctx *echo.Context, audioID string, params GetSpectrogramParams) error {
-	var request GetSpectrogramRequestObject
-
-	request.AudioID = audioID
-	request.Params = params
-
-	handler := func(ctx *echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetSpectrogram(ctx.Request().Context(), request.(GetSpectrogramRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GetSpectrogram")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(GetSpectrogramResponseObject); ok {
-		return validResponse.VisitGetSpectrogramResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
 }
 
 // GetSpectrum operation middleware

@@ -8,10 +8,6 @@ import (
 	"github.com/labstack/echo/v5"
 )
 
-func (h *Handler) GetSpectrogram(ctx *echo.Context, audioID string, params generated.GetSpectrogramParams) error {
-	return notImplemented()
-}
-
 func (h *Handler) GetSpectrum(ctx *echo.Context, audioID string, params generated.GetSpectrumParams) error {
 	if h.analysisService == nil {
 		return echo.NewHTTPError(http.StatusServiceUnavailable, "analysis service not available")
