@@ -5,13 +5,12 @@ import (
 )
 
 type EffectReverse struct {
-	name  string           `json:"name"`
 	Param ParameterReverse `json:"parameters"`
 }
 
 type ParameterReverse struct{}
 
-func NewReverse() EffectReverse { return EffectReverse{name: "reverse", Param: ParameterReverse{}} }
+func NewReverse() EffectReverse { return EffectReverse{} }
 
 func (e EffectReverse) Apply(data audio.AudioData, meta audio.Metadata) (audio.AudioData, audio.Metadata, error) {
 	out := reversed(data)
@@ -27,5 +26,5 @@ func reversed(s audio.AudioData) audio.AudioData {
 }
 
 func (e EffectReverse) Name() string {
-	return e.name
+	return "reverse"
 }

@@ -82,6 +82,9 @@ func RequestLogger() echo.MiddlewareFunc {
 					status = http.StatusInternalServerError
 				}
 			}
+			if status == 0 {
+				status = http.StatusOK
+			}
 
 			line := fmt.Sprintf("%s %s %s %s %s",
 				paint(ansiDim, "[http]"),

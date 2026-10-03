@@ -95,7 +95,13 @@ func TestAudioEndpointsSupportFixtureFormats(t *testing.T) {
 			// 字节流不可能与原始 fixture 相同（mp3 有损，且重编码为双声道）。
 			// 语义上的往返无损 = 重新编码后的音频能被解回同样的采样率与时长
 			// （解码端会下混回 mono，样本数按采样率换算即为时长）。
-			expectedMIME := transporthttp.FormatToMIME(audio.Format(strings.TrimPrefix(filepath.Ext(fixture), ".")))
+			// 上传时 ogg 被归一化为 wav（见 AudioService.Upload），
+			// 下载 MIME 按归一化后的格式判断。
+			wantFormat := audio.Format(strings.TrimPrefix(filepath.Ext(fixture), "."))
+			if wantFormat == "ogg" {
+				wantFormat = "wav"
+			}
+			expectedMIME := transporthttp.FormatToMIME(wantFormat)
 			if got := downloadResponse.Header().Get(echo.HeaderContentType); got != expectedMIME {
 				t.Fatalf("download content-type = %q, want %q", got, expectedMIME)
 			}

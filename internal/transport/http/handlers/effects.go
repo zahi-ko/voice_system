@@ -3,8 +3,10 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"voice_system/internal/domain/effects"
 	"voice_system/internal/transport/http/generated"
+	"voice_system/internal/transport/http/middleware"
 
 	"github.com/labstack/echo/v5"
 	openapi_types "github.com/oapi-codegen/runtime/types"
@@ -29,6 +31,9 @@ func (h *Handler) ApplyEffect(ctx *echo.Context, audioID openapi_types.UUID, par
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to apply effect")
 	}
+
+	effectName, _ := payload["name"].(string)
+	middleware.SetDetail(ctx, "effect=%s save=%t", effectName, save)
 
 	audioMeta := transporthttp.AudioToAPI(aud)
 
@@ -59,6 +64,8 @@ func (h *Handler) ApplyEffectChain(ctx *echo.Context, audioID openapi_types.UUID
 
 	response := transporthttp.EffectChainResponseToAPI(aud, applied)
 
+	middleware.SetDetail(ctx, "chain=%d save=%t applied=%s", len(payload), save, strings.TrimSuffix(applied, "->"))
+
 	return ctx.JSON(http.StatusOK, response)
 }
 
@@ -68,5 +75,6 @@ func (h *Handler) ListEffects(ctx *echo.Context) error {
 	}
 
 	effectsList := h.effectService.ListAvailable()
+	middleware.SetDetail(ctx, "count=%d", len(effectsList))
 	return ctx.JSON(http.StatusOK, effectsList)
 }

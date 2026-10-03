@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"io"
 	"net/http"
 	"time"
 
@@ -53,11 +54,11 @@ func (h *Handler) RemoveAudio(ctx *echo.Context, audioID openapi_types.UUID) err
 
 	id := transporthttp.APItoUUID(audioID)
 
-	err := h.audioService.Delete(ctx.Request().Context(), id)
-	if err != nil {
+	if err := h.audioService.Delete(ctx.Request().Context(), id); err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "The request was invalid or cannot be serverd")
 	}
 
+	middleware.SetDetail(ctx, "id=%s", id)
 	return ctx.NoContent(http.StatusNoContent)
 }
 
@@ -76,7 +77,15 @@ func (h *Handler) DownloadAudio(ctx *echo.Context, audioID openapi_types.UUID) e
 	name := a.Name + "." + string(a.Meta.Format)
 	modtime := time.Time{}
 
-	// middleware.SetDetail(ctx, "name=%s size=%s", name, middleware.HumanSize(info.Size()))
+	// data 是编码后的 ReadSeeker，用 Seek(END) 量取长度后必须回到起点。
+	size := int64(0)
+	if pos, serr := data.Seek(0, io.SeekEnd); serr == nil {
+		size = pos
+		if _, serr := data.Seek(0, io.SeekStart); serr != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "rewind audio data failed")
+		}
+	}
+	middleware.SetDetail(ctx, "name=%s size=%s", name, middleware.HumanSize(size))
 
 	ctx.Response().Header().Set(echo.HeaderContentType, mime)
 

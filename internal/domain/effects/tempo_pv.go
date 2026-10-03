@@ -10,7 +10,6 @@ import (
 )
 
 type EffectTempoPV struct {
-	name  string         `json:"name"`
 	Param ParameterTempo `json:"parameters"`
 }
 
@@ -18,7 +17,7 @@ func NewTempoPV(p ParameterTempo) (EffectTempoPV, error) {
 	if p.Tempo < 0.5 || p.Tempo > 2.0 {
 		return EffectTempoPV{}, fmt.Errorf("effects: tempo %.2f out of range [0.5, 2.0]", p.Tempo)
 	}
-	return EffectTempoPV{name: "tempo_pv", Param: p}, nil
+	return EffectTempoPV{Param: p}, nil
 }
 
 func (e EffectTempoPV) Apply(data audio.AudioData, meta audio.Metadata) (audio.AudioData, audio.Metadata, error) {
@@ -38,7 +37,7 @@ func (e EffectTempoPV) Apply(data audio.AudioData, meta audio.Metadata) (audio.A
 }
 
 func (e EffectTempoPV) Name() string {
-	return e.name
+	return "tempo_pv"
 }
 
 type PhaseVoCoder struct {
