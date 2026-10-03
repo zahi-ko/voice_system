@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"net/http"
-	"voice_system/internal/transport/http/generated"
 	transporthttp "voice_system/internal/transport/http"
+	"voice_system/internal/transport/http/generated"
 
 	"github.com/labstack/echo/v5"
 )
@@ -13,7 +13,17 @@ func (h *Handler) GetSpectrogram(ctx *echo.Context, audioID string, params gener
 }
 
 func (h *Handler) GetSpectrum(ctx *echo.Context, audioID string, params generated.GetSpectrumParams) error {
-	return notImplemented()
+	if h.analysisService == nil {
+		return echo.NewHTTPError(http.StatusServiceUnavailable, "analysis service not available")
+	}
+
+	nfft := transporthttp.APItoNFFT(params)
+	spectrum, err := h.analysisService.GetSpectrum(ctx.Request().Context(), audioID, nfft)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "The request was invalid or cannot be served.")
+	}
+
+	return ctx.JSON(http.StatusOK, spectrum)
 }
 
 func (h *Handler) GetStats(ctx *echo.Context, audioID string) error {

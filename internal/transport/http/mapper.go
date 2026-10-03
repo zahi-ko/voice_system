@@ -100,3 +100,10 @@ func APItoPoint(point generated.GetWaveformParams) int {
 	}
 	return *point.Points
 }
+
+func APItoNFFT(nfft generated.GetSpectrumParams) int {
+	if nfft.Nfft == nil {
+		return 1024
+	}
+	return int(*nfft.Nfft)
+}
