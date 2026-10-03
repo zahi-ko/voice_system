@@ -31,7 +31,8 @@ func main() {
 
 	audio_service := application.NewAudioService(audioio.NewDecoder(), audioio.NewEncoder(), store)
 	effect_service := application.NewEffectService(store, registry)
-	handler := handlers.NewHandler(audio_service, effect_service)
+	analysis_service := application.NewAnalysisService(store)
+	handler := handlers.NewHandler(audio_service, effect_service, analysis_service)
 	handlers.Register(e, handler)
 	e.Static("/", "web/dist")
 

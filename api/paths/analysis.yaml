@@ -11,19 +11,20 @@ getStats:
         description: The unique identifier of the audio file to analyze.
         schema:
           type: string
+          format: uuid
     responses:
-      '200':
+      "200":
         description: Audio statistics retrieved successfully.
         content:
           application/json:
             schema:
-              $ref: '../server.yaml#/components/schemas/AudioStats'
-      '404':
-        $ref: '../server.yaml#/components/responses/NotFound'
-      '500':
-        $ref: '../server.yaml#/components/responses/InternalServerError'
-      '503':
-        $ref: '../server.yaml#/components/responses/ServiceUnavailable'
+              $ref: "../server.yaml#/components/schemas/AudioStats"
+      "404":
+        $ref: "../server.yaml#/components/responses/NotFound"
+      "500":
+        $ref: "../server.yaml#/components/responses/InternalServerError"
+      "503":
+        $ref: "../server.yaml#/components/responses/ServiceUnavailable"
 
 getWaveform:
   get:
@@ -38,6 +39,7 @@ getWaveform:
         description: The unique identifier of the audio file to analyze.
         schema:
           type: string
+          format: uuid
       - name: points
         in: query
         required: false
@@ -48,20 +50,20 @@ getWaveform:
           maximum: 20000
           default: 2000
     responses:
-      '200':
+      "200":
         description: Audio waveform retrieved successfully.
         content:
           application/json:
             schema:
-              $ref: '../server.yaml#/components/schemas/WaveformResponse'
-      '400':
-        $ref: '../server.yaml#/components/responses/BadRequest'
-      '404':
-        $ref: '../server.yaml#/components/responses/NotFound'
-      '500':
-        $ref: '../server.yaml#/components/responses/InternalServerError'
-      '503':
-        $ref: '../server.yaml#/components/responses/ServiceUnavailable'
+              $ref: "../server.yaml#/components/schemas/WaveformResponse"
+      "400":
+        $ref: "../server.yaml#/components/responses/BadRequest"
+      "404":
+        $ref: "../server.yaml#/components/responses/NotFound"
+      "500":
+        $ref: "../server.yaml#/components/responses/InternalServerError"
+      "503":
+        $ref: "../server.yaml#/components/responses/ServiceUnavailable"
 
 getSpectrum:
   get:
@@ -76,6 +78,7 @@ getSpectrum:
         description: The unique identifier of the audio file to analyze.
         schema:
           type: string
+          format: uuid
       - name: nfft
         in: query
         required: false
@@ -85,20 +88,20 @@ getSpectrum:
           enum: [128, 256, 512, 1024, 2048, 4096, 8192]
           default: 1024
     responses:
-      '200':
+      "200":
         description: Audio spectrum retrieved successfully.
         content:
           application/json:
             schema:
-              $ref: '../server.yaml#/components/schemas/SpectrumResponse'
-      '400':
-        $ref: '../server.yaml#/components/responses/BadRequest'
-      '404':
-        $ref: '../server.yaml#/components/responses/NotFound'
-      '500':
-        $ref: '../server.yaml#/components/responses/InternalServerError'
-      '503':
-        $ref: '../server.yaml#/components/responses/ServiceUnavailable'
+              $ref: "../server.yaml#/components/schemas/SpectrumResponse"
+      "400":
+        $ref: "../server.yaml#/components/responses/BadRequest"
+      "404":
+        $ref: "../server.yaml#/components/responses/NotFound"
+      "500":
+        $ref: "../server.yaml#/components/responses/InternalServerError"
+      "503":
+        $ref: "../server.yaml#/components/responses/ServiceUnavailable"
 
 getSpectrogram:
   get:
@@ -149,17 +152,17 @@ getSpectrogram:
           maximum: 60.0
           default: 0.0
     responses:
-      '200':
+      "200":
         description: Audio spectrogram retrieved successfully.
         content:
           application/json:
             schema:
-              $ref: '../server.yaml#/components/schemas/SpectrogramResponse'
-      '400':
-        $ref: '../server.yaml#/components/responses/BadRequest'
-      '404':
-        $ref: '../server.yaml#/components/responses/NotFound'
-      '500':
-        $ref: '../server.yaml#/components/responses/InternalServerError'
-      '503':
-        $ref: '../server.yaml#/components/responses/ServiceUnavailable'
+              $ref: "../server.yaml#/components/schemas/SpectrogramResponse"
+      "400":
+        $ref: "../server.yaml#/components/responses/BadRequest"
+      "404":
+        $ref: "../server.yaml#/components/responses/NotFound"
+      "500":
+        $ref: "../server.yaml#/components/responses/InternalServerError"
+      "503":
+        $ref: "../server.yaml#/components/responses/ServiceUnavailable"

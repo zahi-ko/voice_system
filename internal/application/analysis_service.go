@@ -180,16 +180,16 @@ func getRMS(data audio.AudioData) (float64, error) {
 
 func linspaceEdges(start, stop, edge int) []int {
 	edges := make([]int, edge)
-	for i := 0; i <= edge; i++ {
+	for i := range edge {
 		edges[i] = start + (stop-start)*i/edge
 	}
-	edges[edge] = stop
+	// edges[edge] = stop
 	return edges
 }
 
 func hanningWindow(n int) []float64 {
 	window := make([]float64, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		window[i] = 0.5 * (1 - math.Cos(2*math.Pi*float64(i)/float64(n-1)))
 	}
 	return window

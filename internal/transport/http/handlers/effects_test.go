@@ -36,7 +36,7 @@ func newEffectsRouter(t *testing.T) (*echo.Echo, string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	handler := NewHandler(application.NewAudioService(audioio.NewDecoder(), audioio.NewEncoder(), store), application.NewEffectService(store, registry))
+	handler := NewHandler(application.NewAudioService(audioio.NewDecoder(), audioio.NewEncoder(), store), application.NewEffectService(store, registry), application.NewAnalysisService(store))
 	router := echo.New()
 	Register(router, handler)
 
@@ -127,6 +127,8 @@ func TestApplyEffectInvalidPayload(t *testing.T) {
 	}{
 		{"missing name", `{}`},
 		{"unknown effect", `{"name":"pitch"}`},
+		{"gain out of range", `{"name":"gain","parameters":{"db":999}}`},
+		{"tempo out of range", `{"name":"tempo","parameters":{"tempo":4.0}}`},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -180,5 +182,39 @@ func TestApplyEffectChainEmpty(t *testing.T) {
 
 	if rec.Code != http.StatusBadRequest {
 		t.Fatalf("empty chain status = %d, want %d: %s", rec.Code, http.StatusBadRequest, rec.Body.String())
+	}
+}
+
+func TestApplyEffectChainNameTruncated(t *testing.T) {
+	router, id := newEffectsRouter(t)
+
+	// 40 次 reverse 的链名远超 64 字节上限，应被截断为头尾保留形式
+	chain := make([]string, 40)
+	for i := range chain {
+		chain[i] = `{"name":"reverse"}`
+	}
+	body := []byte("[" + strings.Join(chain, ",") + "]")
+	req := httptest.NewRequest(http.MethodPost, "/effects/"+id+"/chain", bytes.NewReader(body))
+	req.Header.Set(echo.HeaderContentType, "application/json")
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("chain status = %d, want %d: %s", rec.Code, http.StatusOK, rec.Body.String())
+	}
+
+	var response struct {
+		Metadata struct {
+			Name string `json:"name"`
+		} `json:"metadata"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &response); err != nil {
+		t.Fatalf("decode chain response: %v", err)
+	}
+	if len(response.Metadata.Name) > 64 {
+		t.Errorf("chain name length = %d, want <= 64: %q", len(response.Metadata.Name), response.Metadata.Name)
+	}
+	if !strings.Contains(response.Metadata.Name, "...") {
+		t.Errorf("truncated chain name %q should contain \"...\"", response.Metadata.Name)
 	}
 }

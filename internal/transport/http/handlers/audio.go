@@ -55,7 +55,7 @@ func (h *Handler) RemoveAudio(ctx *echo.Context, audioID openapi_types.UUID) err
 	id := transporthttp.APItoUUID(audioID)
 
 	if err := h.audioService.Delete(ctx.Request().Context(), id); err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "The request was invalid or cannot be serverd")
+		return echo.NewHTTPError(http.StatusNotFound, "The request was invalid or cannot be served.")
 	}
 
 	middleware.SetDetail(ctx, "id=%s", id)

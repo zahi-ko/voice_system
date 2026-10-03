@@ -126,12 +126,12 @@ func (s *AudioStore) Delete(ctx context.Context, id string) error {
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
-
 	delete(s.items, id)
+
 	path := filepath.Join(s.root, id)
 	err := os.Remove(path)
 
-	if err != nil {
+	if err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("remove file: %w", err)
 	}
 
@@ -145,8 +145,12 @@ func (s *AudioStore) Replace(ctx context.Context, id string, item audio.Audio, a
 	default:
 	}
 
-	s.Delete(ctx, id)
-	s.Save(ctx, item, audioData)
+	if err := s.Delete(ctx, id); err != nil {
+		return fmt.Errorf("delete old audio: %w", err)
+	}
+	if err := s.Save(ctx, item, audioData); err != nil {
+		return fmt.Errorf("save replaced audio: %w", err)
+	}
 
 	return nil
 }

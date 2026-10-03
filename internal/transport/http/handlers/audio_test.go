@@ -45,7 +45,7 @@ func TestAudioEndpointsSupportFixtureFormats(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			handler := NewHandler(application.NewAudioService(audioio.NewDecoder(), audioio.NewEncoder(), store), application.NewEffectService(store, registry))
+			handler := NewHandler(application.NewAudioService(audioio.NewDecoder(), audioio.NewEncoder(), store), application.NewEffectService(store, registry), application.NewAnalysisService(store))
 			router := echo.New()
 			Register(router, handler)
 

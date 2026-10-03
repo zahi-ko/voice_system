@@ -2,8 +2,6 @@ package application
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"fmt"
 
 	"voice_system/internal/application/ports"
@@ -14,7 +12,6 @@ import (
 )
 
 type EffectService struct {
-	last     string
 	store    ports.AudioStore
 	registry ports.EffectRegistry
 }
@@ -30,7 +27,7 @@ func NewEffectService(
 }
 
 func (s *EffectService) Apply(ctx context.Context, audioId string, save bool, payload effects.Payload) (audio.Audio, error) {
-	effect, err := s.bindEffect(payload)
+	effect, err := s.registry.Bind(payload)
 	if err != nil {
 		return audio.Audio{}, fmt.Errorf("bind effect: %w", err)
 	}
@@ -48,7 +45,7 @@ func (s *EffectService) Apply(ctx context.Context, audioId string, save bool, pa
 	newAud := audio.Audio{
 		ID:   audioId,
 		Meta: meta,
-		Name: aud.Name + "_" + effect.Name(),
+		Name: truncateName(aud.Name + "_" + effect.Name()),
 	}
 
 	if !save {
@@ -56,10 +53,10 @@ func (s *EffectService) Apply(ctx context.Context, audioId string, save bool, pa
 			return audio.Audio{}, fmt.Errorf("replace audio: %w", err)
 		}
 	} else {
+		newAud.ID = uuid.NewString()
 		if err := s.store.Save(ctx, newAud, out); err != nil {
 			return audio.Audio{}, fmt.Errorf("save new audio: %w", err)
 		}
-		newAud.ID = uuid.NewString()
 	}
 
 	return newAud, nil
@@ -75,7 +72,7 @@ func (s *EffectService) ApplyChain(ctx context.Context, audioId string, save boo
 	}
 
 	for _, payload := range payloads {
-		effect, err := s.bindEffect(payload)
+		effect, err := s.registry.Bind(payload)
 		if err != nil {
 			return audio.Audio{}, "", fmt.Errorf("bind effect: %w", err)
 		}
@@ -91,7 +88,7 @@ func (s *EffectService) ApplyChain(ctx context.Context, audioId string, save boo
 	newAud := audio.Audio{
 		ID:   audioId,
 		Meta: aud.Meta,
-		Name: aud.Name + "_" + applied,
+		Name: truncateName(aud.Name + "_" + applied),
 	}
 
 	if !save {
@@ -99,10 +96,10 @@ func (s *EffectService) ApplyChain(ctx context.Context, audioId string, save boo
 			return audio.Audio{}, "", fmt.Errorf("replace audio: %w", err)
 		}
 	} else {
+		newAud.ID = uuid.NewString()
 		if err := s.store.Save(ctx, newAud, data); err != nil {
 			return audio.Audio{}, "", fmt.Errorf("save new audio: %w", err)
 		}
-		newAud.ID = uuid.NewString()
 	}
 
 	return newAud, applied, nil
@@ -113,33 +110,13 @@ func (s *EffectService) ListAvailable() []string {
 	return s.registry.Names()
 }
 
-func (s *EffectService) bindEffect(payload effects.Payload) (effects.Effect, error) {
-	effectMap := s.registry.GetMap()
+// maxNameLen 音频名称长度上限，超长时保留头尾。
+const maxNameLen = 64
 
-	rawName, ok := payload["name"]
-	if !ok {
-		return nil, errors.New("effect name not provided in payload")
+func truncateName(s string) string {
+	if len(s) <= maxNameLen {
+		return s
 	}
-
-	name, ok := rawName.(string)
-	if !ok {
-		return nil, errors.New("effect name must be a string")
-	}
-
-	eff, ok := effectMap[name]
-	if !ok {
-		return nil, fmt.Errorf("effect %s not found", name)
-	}
-
-	effInstance := eff()
-	data, err := json.Marshal(payload)
-	if err != nil {
-		return nil, fmt.Errorf("marshal payload: %w", err)
-	}
-
-	if err := json.Unmarshal(data, effInstance); err != nil {
-		return nil, fmt.Errorf("unmarshal payload to effect: %w", err)
-	}
-
-	return effInstance, nil
+	keep := maxNameLen/2 - 2
+	return s[:keep] + "..." + s[len(s)-keep:]
 }

@@ -22,6 +22,15 @@ func NewNormalization(p ParameterNormalization) (EffectNormalization, error) {
 	return EffectNormalization{Param: p}, nil
 }
 
+// NewNormalizationFromPayload 从 JSON 载荷构造归一化效果，走构造函数完成参数校验。
+func NewNormalizationFromPayload(p Payload) (Effect, error) {
+	var e EffectNormalization
+	if err := decodePayload(p, &e); err != nil {
+		return nil, err
+	}
+	return NewNormalization(e.Param)
+}
+
 func (e EffectNormalization) Apply(data audio.AudioData, meta audio.Metadata) (audio.AudioData, audio.Metadata, error) {
 	out := make(audio.AudioData, len(data))
 

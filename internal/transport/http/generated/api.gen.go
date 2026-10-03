@@ -615,21 +615,21 @@ type ClientInterface interface {
 	// Retrieve the spectrum data of an audio file.
 	//
 	// Corresponds with GET /analysis/{audioId}/spectrum (the `GetSpectrum` operationId).
-	GetSpectrum(ctx context.Context, audioID string, params *GetSpectrumParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetSpectrum(ctx context.Context, audioID openapi_types.UUID, params *GetSpectrumParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetStats Get audio statistics
 	//
 	// Retrieve statistical information about an audio file.
 	//
 	// Corresponds with GET /analysis/{audioId}/stats (the `GetStats` operationId).
-	GetStats(ctx context.Context, audioID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetStats(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetWaveform Get audio waveform
 	//
 	// Retrieve the waveform data of an audio file.
 	//
 	// Corresponds with GET /analysis/{audioId}/waveform (the `GetWaveform` operationId).
-	GetWaveform(ctx context.Context, audioID string, params *GetWaveformParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetWaveform(ctx context.Context, audioID openapi_types.UUID, params *GetWaveformParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListAudio List all audio files
 	//
@@ -717,7 +717,7 @@ type ClientInterface interface {
 // Retrieve the spectrum data of an audio file.
 //
 // Corresponds with GET /analysis/{audioId}/spectrum (the `GetSpectrum` operationId).
-func (c *Client) GetSpectrum(ctx context.Context, audioID string, params *GetSpectrumParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetSpectrum(ctx context.Context, audioID openapi_types.UUID, params *GetSpectrumParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetSpectrumRequest(c.Server, audioID, params)
 	if err != nil {
 		return nil, err
@@ -734,7 +734,7 @@ func (c *Client) GetSpectrum(ctx context.Context, audioID string, params *GetSpe
 // Retrieve statistical information about an audio file.
 //
 // Corresponds with GET /analysis/{audioId}/stats (the `GetStats` operationId).
-func (c *Client) GetStats(ctx context.Context, audioID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetStats(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetStatsRequest(c.Server, audioID)
 	if err != nil {
 		return nil, err
@@ -751,7 +751,7 @@ func (c *Client) GetStats(ctx context.Context, audioID string, reqEditors ...Req
 // Retrieve the waveform data of an audio file.
 //
 // Corresponds with GET /analysis/{audioId}/waveform (the `GetWaveform` operationId).
-func (c *Client) GetWaveform(ctx context.Context, audioID string, params *GetWaveformParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetWaveform(ctx context.Context, audioID openapi_types.UUID, params *GetWaveformParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetWaveformRequest(c.Server, audioID, params)
 	if err != nil {
 		return nil, err
@@ -944,12 +944,12 @@ func (c *Client) GetHealth(ctx context.Context, reqEditors ...RequestEditorFn) (
 }
 
 // NewGetSpectrumRequest constructs an http.Request for the GetSpectrum method
-func NewGetSpectrumRequest(server string, audioID string, params *GetSpectrumParams) (*http.Request, error) {
+func NewGetSpectrumRequest(server string, audioID openapi_types.UUID, params *GetSpectrumParams) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "audioId", audioID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "audioId", audioID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
 	if err != nil {
 		return nil, err
 	}
@@ -1005,12 +1005,12 @@ func NewGetSpectrumRequest(server string, audioID string, params *GetSpectrumPar
 }
 
 // NewGetStatsRequest constructs an http.Request for the GetStats method
-func NewGetStatsRequest(server string, audioID string) (*http.Request, error) {
+func NewGetStatsRequest(server string, audioID openapi_types.UUID) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "audioId", audioID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "audioId", audioID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
 	if err != nil {
 		return nil, err
 	}
@@ -1039,12 +1039,12 @@ func NewGetStatsRequest(server string, audioID string) (*http.Request, error) {
 }
 
 // NewGetWaveformRequest constructs an http.Request for the GetWaveform method
-func NewGetWaveformRequest(server string, audioID string, params *GetWaveformParams) (*http.Request, error) {
+func NewGetWaveformRequest(server string, audioID openapi_types.UUID, params *GetWaveformParams) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "audioId", audioID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "audioId", audioID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
 	if err != nil {
 		return nil, err
 	}
@@ -1476,7 +1476,7 @@ type ClientWithResponsesInterface interface {
 	// Returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with GET /analysis/{audioId}/spectrum (the `GetSpectrum` operationId).
-	GetSpectrumWithResponse(ctx context.Context, audioID string, params *GetSpectrumParams, reqEditors ...RequestEditorFn) (*GetSpectrumResponse, error)
+	GetSpectrumWithResponse(ctx context.Context, audioID openapi_types.UUID, params *GetSpectrumParams, reqEditors ...RequestEditorFn) (*GetSpectrumResponse, error)
 
 	// GetStatsWithResponse Get audio statistics
 	//
@@ -1485,7 +1485,7 @@ type ClientWithResponsesInterface interface {
 	// Returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with GET /analysis/{audioId}/stats (the `GetStats` operationId).
-	GetStatsWithResponse(ctx context.Context, audioID string, reqEditors ...RequestEditorFn) (*GetStatsResponse, error)
+	GetStatsWithResponse(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetStatsResponse, error)
 
 	// GetWaveformWithResponse Get audio waveform
 	//
@@ -1494,7 +1494,7 @@ type ClientWithResponsesInterface interface {
 	// Returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with GET /analysis/{audioId}/waveform (the `GetWaveform` operationId).
-	GetWaveformWithResponse(ctx context.Context, audioID string, params *GetWaveformParams, reqEditors ...RequestEditorFn) (*GetWaveformResponse, error)
+	GetWaveformWithResponse(ctx context.Context, audioID openapi_types.UUID, params *GetWaveformParams, reqEditors ...RequestEditorFn) (*GetWaveformResponse, error)
 
 	// ListAudioWithResponse List all audio files
 	//
@@ -2259,7 +2259,7 @@ func (r GetHealthResponse) ContentType() string {
 // Returns a wrapper object for the known response body format(s).
 //
 // Corresponds with GET /analysis/{audioId}/spectrum (the `GetSpectrum` operationId).
-func (c *ClientWithResponses) GetSpectrumWithResponse(ctx context.Context, audioID string, params *GetSpectrumParams, reqEditors ...RequestEditorFn) (*GetSpectrumResponse, error) {
+func (c *ClientWithResponses) GetSpectrumWithResponse(ctx context.Context, audioID openapi_types.UUID, params *GetSpectrumParams, reqEditors ...RequestEditorFn) (*GetSpectrumResponse, error) {
 	rsp, err := c.GetSpectrum(ctx, audioID, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2274,7 +2274,7 @@ func (c *ClientWithResponses) GetSpectrumWithResponse(ctx context.Context, audio
 // Returns a wrapper object for the known response body format(s).
 //
 // Corresponds with GET /analysis/{audioId}/stats (the `GetStats` operationId).
-func (c *ClientWithResponses) GetStatsWithResponse(ctx context.Context, audioID string, reqEditors ...RequestEditorFn) (*GetStatsResponse, error) {
+func (c *ClientWithResponses) GetStatsWithResponse(ctx context.Context, audioID openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetStatsResponse, error) {
 	rsp, err := c.GetStats(ctx, audioID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2289,7 +2289,7 @@ func (c *ClientWithResponses) GetStatsWithResponse(ctx context.Context, audioID 
 // Returns a wrapper object for the known response body format(s).
 //
 // Corresponds with GET /analysis/{audioId}/waveform (the `GetWaveform` operationId).
-func (c *ClientWithResponses) GetWaveformWithResponse(ctx context.Context, audioID string, params *GetWaveformParams, reqEditors ...RequestEditorFn) (*GetWaveformResponse, error) {
+func (c *ClientWithResponses) GetWaveformWithResponse(ctx context.Context, audioID openapi_types.UUID, params *GetWaveformParams, reqEditors ...RequestEditorFn) (*GetWaveformResponse, error) {
 	rsp, err := c.GetWaveform(ctx, audioID, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2942,13 +2942,13 @@ func ParseGetHealthResponse(rsp *http.Response) (*GetHealthResponse, error) {
 type ServerInterface interface {
 	// GetSpectrum Get audio spectrum
 	// (GET /analysis/{audioId}/spectrum)
-	GetSpectrum(ctx *echo.Context, audioID string, params GetSpectrumParams) error
+	GetSpectrum(ctx *echo.Context, audioID openapi_types.UUID, params GetSpectrumParams) error
 	// GetStats Get audio statistics
 	// (GET /analysis/{audioId}/stats)
-	GetStats(ctx *echo.Context, audioID string) error
+	GetStats(ctx *echo.Context, audioID openapi_types.UUID) error
 	// GetWaveform Get audio waveform
 	// (GET /analysis/{audioId}/waveform)
-	GetWaveform(ctx *echo.Context, audioID string, params GetWaveformParams) error
+	GetWaveform(ctx *echo.Context, audioID openapi_types.UUID, params GetWaveformParams) error
 	// ListAudio List all audio files
 	// (GET /audio)
 	ListAudio(ctx *echo.Context) error
@@ -2984,9 +2984,9 @@ type ServerInterfaceWrapper struct {
 func (w *ServerInterfaceWrapper) GetSpectrum(ctx *echo.Context) error {
 	var err error
 	// ------------- Path parameter "audioId" -------------
-	var audioID string
+	var audioID openapi_types.UUID
 
-	err = runtime.BindStyledParameterWithOptions("simple", "audioId", ctx.Param("audioId"), &audioID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: ctx.Request().URL.RawPath == ""})
+	err = runtime.BindStyledParameterWithOptions("simple", "audioId", ctx.Param("audioId"), &audioID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: ctx.Request().URL.RawPath == ""})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter audioId: %s", err))
 	}
@@ -3009,9 +3009,9 @@ func (w *ServerInterfaceWrapper) GetSpectrum(ctx *echo.Context) error {
 func (w *ServerInterfaceWrapper) GetStats(ctx *echo.Context) error {
 	var err error
 	// ------------- Path parameter "audioId" -------------
-	var audioID string
+	var audioID openapi_types.UUID
 
-	err = runtime.BindStyledParameterWithOptions("simple", "audioId", ctx.Param("audioId"), &audioID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: ctx.Request().URL.RawPath == ""})
+	err = runtime.BindStyledParameterWithOptions("simple", "audioId", ctx.Param("audioId"), &audioID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: ctx.Request().URL.RawPath == ""})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter audioId: %s", err))
 	}
@@ -3025,9 +3025,9 @@ func (w *ServerInterfaceWrapper) GetStats(ctx *echo.Context) error {
 func (w *ServerInterfaceWrapper) GetWaveform(ctx *echo.Context) error {
 	var err error
 	// ------------- Path parameter "audioId" -------------
-	var audioID string
+	var audioID openapi_types.UUID
 
-	err = runtime.BindStyledParameterWithOptions("simple", "audioId", ctx.Param("audioId"), &audioID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: ctx.Request().URL.RawPath == ""})
+	err = runtime.BindStyledParameterWithOptions("simple", "audioId", ctx.Param("audioId"), &audioID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: ctx.Request().URL.RawPath == ""})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter audioId: %s", err))
 	}
@@ -3234,7 +3234,7 @@ type NotFoundJSONResponse Error
 type ServiceUnavailableJSONResponse Error
 
 type GetSpectrumRequestObject struct {
-	AudioID string `json:"audioId"`
+	AudioID openapi_types.UUID `json:"audioId"`
 	Params  GetSpectrumParams
 }
 
@@ -3315,7 +3315,7 @@ func (response GetSpectrum503JSONResponse) VisitGetSpectrumResponse(w http.Respo
 }
 
 type GetStatsRequestObject struct {
-	AudioID string `json:"audioId"`
+	AudioID openapi_types.UUID `json:"audioId"`
 }
 
 type GetStatsResponseObject interface {
@@ -3381,7 +3381,7 @@ func (response GetStats503JSONResponse) VisitGetStatsResponse(w http.ResponseWri
 }
 
 type GetWaveformRequestObject struct {
-	AudioID string `json:"audioId"`
+	AudioID openapi_types.UUID `json:"audioId"`
 	Params  GetWaveformParams
 }
 
@@ -3991,7 +3991,7 @@ type strictHandler struct {
 }
 
 // GetSpectrum operation middleware
-func (sh *strictHandler) GetSpectrum(ctx *echo.Context, audioID string, params GetSpectrumParams) error {
+func (sh *strictHandler) GetSpectrum(ctx *echo.Context, audioID openapi_types.UUID, params GetSpectrumParams) error {
 	var request GetSpectrumRequestObject
 
 	request.AudioID = audioID
@@ -4017,7 +4017,7 @@ func (sh *strictHandler) GetSpectrum(ctx *echo.Context, audioID string, params G
 }
 
 // GetStats operation middleware
-func (sh *strictHandler) GetStats(ctx *echo.Context, audioID string) error {
+func (sh *strictHandler) GetStats(ctx *echo.Context, audioID openapi_types.UUID) error {
 	var request GetStatsRequestObject
 
 	request.AudioID = audioID
@@ -4042,7 +4042,7 @@ func (sh *strictHandler) GetStats(ctx *echo.Context, audioID string) error {
 }
 
 // GetWaveform operation middleware
-func (sh *strictHandler) GetWaveform(ctx *echo.Context, audioID string, params GetWaveformParams) error {
+func (sh *strictHandler) GetWaveform(ctx *echo.Context, audioID openapi_types.UUID, params GetWaveformParams) error {
 	var request GetWaveformRequestObject
 
 	request.AudioID = audioID

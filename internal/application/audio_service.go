@@ -13,8 +13,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const maxUploadSize = 100 << 20
-
 type AudioService struct {
 	decoder ports.AudioDecoder
 	encoder ports.AudioEncoder
@@ -27,11 +25,12 @@ func NewAudioService(decoder ports.AudioDecoder, encoder ports.AudioEncoder, sto
 
 func (s *AudioService) Upload(ctx context.Context, name string, content io.ReadSeeker) (audio.Audio, error) {
 	metadata, err := s.decoder.DecodeMeta(content)
-	if format := metadata.Format; format == "ogg" {
-		metadata.Format = "wav"
-	}
 	if err != nil {
 		return audio.Audio{}, fmt.Errorf("decode audio metadata: %w", err)
+	}
+	// ogg 解码后统一以 wav 归一化存储
+	if metadata.Format == "ogg" {
+		metadata.Format = "wav"
 	}
 
 	data, err := s.decoder.Decode(content)

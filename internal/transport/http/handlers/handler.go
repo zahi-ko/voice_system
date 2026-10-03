@@ -19,10 +19,11 @@ type Handler struct {
 var _ generated.ServerInterface = (*Handler)(nil)
 
 // NewHandler creates an API handler skeleton.
-func NewHandler(audioService *application.AudioService, effectService *application.EffectService) *Handler {
+func NewHandler(audioService *application.AudioService, effectService *application.EffectService, analysisService *application.AnalysisService) *Handler {
 	return &Handler{
-		audioService:  audioService,
-		effectService: effectService,
+		audioService:    audioService,
+		effectService:   effectService,
+		analysisService: analysisService,
 	}
 }
 

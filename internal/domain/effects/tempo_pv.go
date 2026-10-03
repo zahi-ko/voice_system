@@ -20,6 +20,15 @@ func NewTempoPV(p ParameterTempo) (EffectTempoPV, error) {
 	return EffectTempoPV{Param: p}, nil
 }
 
+// NewTempoPVFromPayload 从 JSON 载荷构造相位声码器变速效果，走构造函数完成参数校验。
+func NewTempoPVFromPayload(p Payload) (Effect, error) {
+	var e EffectTempoPV
+	if err := decodePayload(p, &e); err != nil {
+		return nil, err
+	}
+	return NewTempoPV(e.Param)
+}
+
 func (e EffectTempoPV) Apply(data audio.AudioData, meta audio.Metadata) (audio.AudioData, audio.Metadata, error) {
 	pv, err := NewPhaseVoCoder(2048, 512)
 	if err != nil {
@@ -31,7 +40,8 @@ func (e EffectTempoPV) Apply(data audio.AudioData, meta audio.Metadata) (audio.A
 		return nil, meta, fmt.Errorf("effects: failed to stretch audio data: %v", err)
 	}
 
-	// a := len(out) / meta.SampleRate
+	// tempo_pv 改变样本数（采样率不变），时长按输出长度重算
+	meta.Duration = float32(len(out)) / float32(meta.SampleRate)
 
 	return out, meta, nil
 }

@@ -24,6 +24,15 @@ func NewGain(p ParameterGain) (EffectGain, error) {
 	return EffectGain{Param: p}, nil
 }
 
+// NewGainFromPayload 从 JSON 载荷构造增益效果，走构造函数完成参数校验。
+func NewGainFromPayload(p Payload) (Effect, error) {
+	var e EffectGain
+	if err := decodePayload(p, &e); err != nil {
+		return nil, err
+	}
+	return NewGain(e.Param)
+}
+
 func (e EffectGain) Apply(data audio.AudioData, meta audio.Metadata) (audio.AudioData, audio.Metadata, error) {
 	factor := math.Pow(10, float64(e.Param.GainDB/20))
 	out := make(audio.AudioData, len(data))

@@ -21,6 +21,15 @@ func NewTempo(p ParameterTempo) (EffectTempo, error) {
 	return EffectTempo{Param: p}, nil
 }
 
+// NewTempoFromPayload 从 JSON 载荷构造变速效果，走构造函数完成参数校验。
+func NewTempoFromPayload(p Payload) (Effect, error) {
+	var e EffectTempo
+	if err := decodePayload(p, &e); err != nil {
+		return nil, err
+	}
+	return NewTempo(e.Param)
+}
+
 // 直接修改采样率即可达到变速变调的效果
 func (e EffectTempo) Apply(data audio.AudioData, meta audio.Metadata) (audio.AudioData, audio.Metadata, error) {
 	out := make(audio.AudioData, len(data))
